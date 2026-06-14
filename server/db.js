@@ -1,3 +1,4 @@
+require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
 const Database = require('better-sqlite3');
 const path = require('path');
 
@@ -66,6 +67,36 @@ db.exec(`
     new_value  TEXT,
     message    TEXT,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  )
+`);
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS test_runs_v2 (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    suite_id    INTEGER NOT NULL REFERENCES suites(id) ON DELETE CASCADE,
+    status      TEXT NOT NULL DEFAULT 'in_progress' CHECK(status IN ('in_progress','completed')),
+    pass_count  INTEGER NOT NULL DEFAULT 0,
+    fail_count  INTEGER NOT NULL DEFAULT 0,
+    skip_count  INTEGER NOT NULL DEFAULT 0,
+    start_time  TEXT NOT NULL DEFAULT (datetime('now')),
+    end_time    TEXT,
+    created_by  TEXT NOT NULL DEFAULT '',
+    created_at  TEXT NOT NULL DEFAULT (datetime('now'))
+  )
+`);
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS test_run_results (
+    id               INTEGER PRIMARY KEY AUTOINCREMENT,
+    run_id           INTEGER NOT NULL REFERENCES test_runs_v2(id) ON DELETE CASCADE,
+    test_case_id     INTEGER REFERENCES test_cases(id) ON DELETE SET NULL,
+    result           TEXT NOT NULL DEFAULT 'pending' CHECK(result IN ('pending','passed','failed','skipped')),
+    duration_ms      INTEGER,
+    notes            TEXT NOT NULL DEFAULT '',
+    failed_at        TEXT,
+    github_issue_url TEXT,
+    created_at       TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at       TEXT NOT NULL DEFAULT (datetime('now'))
   )
 `);
 

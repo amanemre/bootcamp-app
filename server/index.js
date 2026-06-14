@@ -2,6 +2,7 @@ const express = require('express');
 const testCasesRouter = require('./routes/test-cases');
 const suitesRouter    = require('./routes/suites');
 const bugsRouter      = require('./routes/bugs');
+const runsRouter      = require('./routes/runs');
 const seed = require('./seed');
 
 const app = express();
@@ -18,6 +19,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/test-cases', testCasesRouter);
 app.use('/api/suites',     suitesRouter);
 app.use('/api/bugs',       bugsRouter);
+app.use('/api/runs',       runsRouter);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

@@ -1,0 +1,23 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/check-response-shape.sh"
+          },
+          {
+            "type": "command",
+            "command": ".claude/hooks/check-severity-enum.sh"
+          },
+          {
+            "type": "command",
+            "command": ".claude/hooks/check-js-build.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

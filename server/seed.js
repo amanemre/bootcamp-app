@@ -126,4 +126,46 @@ module.exports = function seed() {
 
     console.log('Seeded 3 bugs.');
   }
+
+  // --- Test Runs ---
+  const { runCount } = db.prepare('SELECT COUNT(*) as runCount FROM test_runs_v2').get();
+  if (runCount === 0) {
+    const suite = db.prepare('SELECT id FROM suites LIMIT 1').get();
+    if (!suite) { console.log('Skipping run seed — no suites found.'); return; }
+
+    const cases = db.prepare(
+      'SELECT stc.test_case_id FROM suite_test_cases stc WHERE stc.suite_id = ? ORDER BY stc.sort_order ASC'
+    ).all(suite.id);
+    if (cases.length === 0) { console.log('Skipping run seed — suite has no cases.'); return; }
+
+    db.transaction(() => {
+      const run = db.prepare(`
+        INSERT INTO test_runs_v2 (suite_id, status, pass_count, fail_count, skip_count, start_time, end_time, created_by)
+        VALUES (?, 'completed', 0, 0, 0, datetime('now', '-1 hour'), datetime('now', '-30 minutes'), 'demo')
+      `).run(suite.id);
+      const runId = run.lastInsertRowid;
+
+      const RESULTS = ['passed', 'failed', 'skipped'];
+      let passCount = 0, failCount = 0, skipCount = 0;
+      cases.forEach((c, i) => {
+        const result = RESULTS[i % 3];
+        if (result === 'passed') passCount++;
+        if (result === 'failed') failCount++;
+        if (result === 'skipped') skipCount++;
+        db.prepare(`
+          INSERT INTO test_run_results (run_id, test_case_id, result, notes, duration_ms, failed_at)
+          VALUES (?, ?, ?, ?, ?, ?)
+        `).run(
+          runId, c.test_case_id, result,
+          result === 'failed'  ? 'Login form submitted without triggering client-side validation.' : '',
+          result === 'skipped' ? null : 500 + (i * 800),
+          result === 'failed'  ? new Date().toISOString().replace('T', ' ').slice(0, 19) : null
+        );
+      });
+      db.prepare('UPDATE test_runs_v2 SET pass_count=?, fail_count=?, skip_count=? WHERE id=?')
+        .run(passCount, failCount, skipCount, runId);
+    })();
+
+    console.log('Seeded 1 test run.');
+  }
 };

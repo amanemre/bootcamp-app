@@ -8,7 +8,7 @@ import {
   useSortable, arrayMove,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { ArrowLeft, GripVertical, X, Pencil, Trash2, Plus } from 'lucide-react';
+import { ArrowLeft, GripVertical, X, Pencil, Trash2, Plus, Play } from 'lucide-react';
 import SuiteModal from '../components/SuiteModal';
 import AddCasesModal from '../components/AddCasesModal';
 
@@ -97,8 +97,9 @@ export default function TestSuiteDetail() {
   const [notFound,   setNotFound]   = useState(false);
   const [saving,     setSaving]     = useState(false);
   const [saveError,  setSaveError]  = useState('');
-  const [editOpen,   setEditOpen]   = useState(false);
-  const [addOpen,    setAddOpen]    = useState(false);
+  const [editOpen,    setEditOpen]    = useState(false);
+  const [addOpen,     setAddOpen]     = useState(false);
+  const [startingRun, setStartingRun] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -172,6 +173,25 @@ export default function TestSuiteDetail() {
     saveCases(next, prev);
   }
 
+  async function handleNewRun() {
+    setStartingRun(true);
+    setSaveError('');
+    try {
+      const res  = await fetch('/api/runs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ suite_id: Number(id) }),
+      });
+      const json = await res.json();
+      if (json.success) navigate(`/test-runs/${json.data.id}`);
+      else setSaveError(json.error || 'Failed to start run.');
+    } catch {
+      setSaveError('Could not reach the server.');
+    } finally {
+      setStartingRun(false);
+    }
+  }
+
   async function handleDelete() {
     if (!confirm('Delete this suite? This cannot be undone.')) return;
     try {
@@ -219,6 +239,14 @@ export default function TestSuiteDetail() {
           </div>
         </div>
         <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+          <button
+            onClick={handleNewRun}
+            disabled={startingRun || cases.length === 0}
+            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 6, border: 'none', background: cases.length > 0 ? '#16a34a' : '#d1d5db', color: '#fff', cursor: cases.length > 0 ? 'pointer' : 'default', fontSize: 14, fontWeight: 600, opacity: startingRun ? 0.7 : 1 }}
+            title={cases.length === 0 ? 'Add cases to this suite before starting a run' : 'Start a new test run'}
+          >
+            <Play size={13} /> {startingRun ? 'Starting…' : 'New Run'}
+          </button>
           <button
             onClick={() => setEditOpen(true)}
             style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 6, border: '1px solid #d1d5db', background: '#fff', cursor: 'pointer', fontSize: 14 }}
