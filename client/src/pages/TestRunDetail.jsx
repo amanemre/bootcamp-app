@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, CheckCircle, XCircle, MinusCircle, ExternalLink } from 'lucide-react';
+import { ArrowLeft, CheckCircle, XCircle, MinusCircle, ExternalLink, FileText } from 'lucide-react';
 
 const SEV_STYLES = {
   Critical: { background: '#fee2e2', color: '#dc2626' },
@@ -126,6 +126,9 @@ export default function TestRunDetail() {
   const [fetchError, setFetchError] = useState('');
   const [actionError, setActionError] = useState('');
   const [saving,     setSaving]     = useState(false);
+  const [generating,  setGenerating]  = useState(false);
+  const [generateError, setGenerateError] = useState('');
+  const [newReportId, setNewReportId] = useState(null);
 
   const fetchRun = useCallback(async () => {
     setFetchError('');
@@ -164,6 +167,30 @@ export default function TestRunDetail() {
     }
   }
 
+  async function handleGenerateReport() {
+    setGenerating(true);
+    setGenerateError('');
+    setNewReportId(null);
+    try {
+      const res  = await fetch('/api/reports', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ run_id: Number(id) }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        setNewReportId(json.data.id);
+        navigate(`/reports/${json.data.id}`);
+      } else {
+        setGenerateError(json.error || 'Failed to generate report.');
+      }
+    } catch {
+      setGenerateError('Could not reach the server.');
+    } finally {
+      setGenerating(false);
+    }
+  }
+
   if (loading)    return <div style={{ padding: '48px 32px', textAlign: 'center', color: '#9ca3af' }}>Loading…</div>;
   if (notFound)   return <div style={{ padding: '48px 32px', textAlign: 'center', color: '#9ca3af' }}>Run not found.</div>;
   if (fetchError) return (
@@ -185,10 +212,16 @@ export default function TestRunDetail() {
 
       {/* Header */}
       <div style={{ marginBottom: 20 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6, flexWrap: 'wrap' }}>
-          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700 }}>{run.suite_name}</h1>
-          <Badge value={run.status} map={STATUS_STYLES} />
-          {saving && <span style={{ fontSize: 12, color: '#9ca3af', fontStyle: 'italic' }}>Saving…</span>}
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, marginBottom: 6, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+            <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700 }}>{run.suite_name}</h1>
+            <Badge value={run.status} map={STATUS_STYLES} />
+            {saving && <span style={{ fontSize: 12, color: '#9ca3af', fontStyle: 'italic' }}>Saving…</span>}
+          </div>
+          <button onClick={handleGenerateReport} disabled={generating}
+            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 6, border: 'none', background: '#2563eb', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600, flexShrink: 0, opacity: generating ? 0.6 : 1 }}>
+            <FileText size={15} /> {generating ? 'Generating…' : 'Generate report'}
+          </button>
         </div>
         <div style={{ display: 'flex', gap: 16, fontSize: 13, color: '#6b7280', flexWrap: 'wrap' }}>
           {run.feature && <span>Feature: <strong style={{ color: '#374151' }}>{run.feature}</strong></span>}
@@ -197,6 +230,20 @@ export default function TestRunDetail() {
           {run.created_by && <span>By: <strong style={{ color: '#374151' }}>{run.created_by}</strong></span>}
         </div>
       </div>
+
+      {generateError && (
+        <div style={{ background: '#fee2e2', color: '#dc2626', padding: '10px 14px', borderRadius: 6, marginBottom: 16, fontSize: 13, display: 'flex', justifyContent: 'space-between' }}>
+          <span>{generateError}</span>
+          <button onClick={() => setGenerateError('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#dc2626', fontWeight: 700, fontSize: 16 }}>×</button>
+        </div>
+      )}
+
+      {newReportId && (
+        <div style={{ background: '#dcfce7', color: '#15803d', padding: '10px 14px', borderRadius: 6, marginBottom: 16, fontSize: 13, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span>Report #{newReportId} generated.</span>
+          <button onClick={() => navigate(`/reports/${newReportId}`)} style={{ background: 'none', border: '1px solid #15803d', borderRadius: 4, color: '#15803d', cursor: 'pointer', padding: '3px 10px', fontSize: 13, fontWeight: 600 }}>View report</button>
+        </div>
+      )}
 
       <ProgressBar pass={run.pass_count} fail={run.fail_count} skip={run.skip_count} total={total} />
 

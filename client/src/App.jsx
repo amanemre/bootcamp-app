@@ -7,6 +7,8 @@ import Bugs from './pages/Bugs';
 import BugDetail from './pages/BugDetail';
 import TestRuns from './pages/TestRuns';
 import TestRunDetail from './pages/TestRunDetail';
+import Reports from './pages/Reports';
+import ReportDetail from './pages/ReportDetail';
 
 function navLinkStyle({ isActive }) {
   return {
@@ -34,6 +36,7 @@ export default function App() {
         <NavLink to="/test-suites" style={navLinkStyle}>Test Suites</NavLink>
         <NavLink to="/bugs" style={navLinkStyle}>Bugs</NavLink>
         <NavLink to="/test-runs" style={navLinkStyle}>Test Runs</NavLink>
+        <NavLink to="/reports" style={navLinkStyle}>Reports</NavLink>
       </nav>
       <Routes>
         <Route path="/" element={<Dashboard />} />
@@ -44,6 +47,8 @@ export default function App() {
         <Route path="/bugs/:id"        element={<BugDetail />} />
         <Route path="/test-runs"       element={<TestRuns />} />
         <Route path="/test-runs/:id"   element={<TestRunDetail />} />
+        <Route path="/reports"         element={<Reports />} />
+        <Route path="/reports/:id"     element={<ReportDetail />} />
       </Routes>
     </BrowserRouter>
   );

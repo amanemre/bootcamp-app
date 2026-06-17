@@ -168,4 +168,48 @@ module.exports = function seed() {
 
     console.log('Seeded 1 test run.');
   }
+
+  // --- Reports ---
+  const { reportCount } = db.prepare('SELECT COUNT(*) as reportCount FROM reports').get();
+  if (reportCount === 0) {
+    // Snapshot the first completed run into a demo report.
+    const run = db.prepare(`
+      SELECT r.*, s.name as suite_name
+      FROM test_runs_v2 r
+      LEFT JOIN suites s ON s.id = r.suite_id
+      ORDER BY r.id ASC LIMIT 1
+    `).get();
+    if (!run) { console.log('Skipping report seed — no runs found.'); return; }
+
+    const rows = db.prepare(`
+      SELECT rr.*, tc.title as case_title, tc.expected_result, tc.severity
+      FROM test_run_results rr
+      LEFT JOIN test_cases tc ON tc.id = rr.test_case_id
+      WHERE rr.run_id = ?
+      ORDER BY rr.id ASC
+    `).all(run.id);
+
+    const results = rows.map(r => ({
+      case_title:       r.case_title ?? '(deleted case)',
+      severity:         r.severity ?? null,
+      result:           r.result,
+      notes:            r.notes ?? '',
+      duration_ms:      r.duration_ms ?? null,
+      expected_result:  r.expected_result ?? '',
+      failed_at:        r.failed_at ?? null,
+      github_issue_url: r.github_issue_url ?? null,
+    }));
+    const count = v => results.filter(r => r.result === v).length;
+
+    db.prepare(`
+      INSERT INTO reports (run_id, suite_name, run_date, total_count, passed_count, failed_count, skipped_count, results)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      run.id, run.suite_name ?? 'Unknown Suite', run.start_time,
+      results.length, count('passed'), count('failed'), count('skipped'),
+      JSON.stringify(results),
+    );
+
+    console.log('Seeded 1 report.');
+  }
 };

@@ -100,6 +100,21 @@ db.exec(`
   )
 `);
 
+db.exec(`
+  CREATE TABLE IF NOT EXISTS reports (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    run_id        INTEGER REFERENCES test_runs_v2(id) ON DELETE SET NULL,
+    suite_name    TEXT NOT NULL DEFAULT '',
+    run_date      TEXT,
+    total_count   INTEGER NOT NULL DEFAULT 0,
+    passed_count  INTEGER NOT NULL DEFAULT 0,
+    failed_count  INTEGER NOT NULL DEFAULT 0,
+    skipped_count INTEGER NOT NULL DEFAULT 0,
+    results       TEXT NOT NULL DEFAULT '[]',
+    generated_at  TEXT NOT NULL DEFAULT (datetime('now'))
+  )
+`);
+
 // Migration: expand bug_activity.action to include 'field_change'
 const activitySchema = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='bug_activity'").get();
 if (activitySchema && !activitySchema.sql.includes('field_change')) {

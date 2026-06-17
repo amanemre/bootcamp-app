@@ -3,3 +3,7 @@ dist/
 .env
 .env.local
 server/testcases.db
+.DS_Store
+**/.DS_Store
+.vscode/
+*.code-workspace
