@@ -110,6 +110,93 @@ function handleGetMetrics(req, res) {
   }
 }
 
+// Parse a SQLite 'YYYY-MM-DD HH:MM:SS' UTC timestamp into a Date.
+function parseUtc(str) {
+  if (!str) return null;
+  const d = new Date(str.replace(' ', 'T') + 'Z');
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+// Monday 00:00 UTC of the week containing the given date.
+function weekStartUtc(d) {
+  const date = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+  const day  = date.getUTCDay();                 // 0=Sun … 6=Sat
+  const shift = day === 0 ? -6 : 1 - day;        // back to Monday
+  date.setUTCDate(date.getUTCDate() + shift);
+  return date;
+}
+
+function handleGetTrends(req, res) {
+  try {
+    // --- 1. Pass-rate trend over the last 10 runs (oldest → newest) ---
+    const recentRuns = db.prepare(`
+      SELECT id, suite_id, pass_count, fail_count, skip_count, start_time, created_at
+      FROM test_runs_v2
+      ORDER BY datetime(created_at) DESC, id DESC
+      LIMIT 10
+    `).all().reverse();
+    const passRateTrend = recentRuns.map(r => {
+      const decided = (r.pass_count || 0) + (r.fail_count || 0);
+      return {
+        run_id:    r.id,
+        date:      r.start_time || r.created_at,
+        pass_rate: decided > 0 ? Math.round((r.pass_count / decided) * 100) : 0,
+      };
+    });
+
+    // --- 2. Bugs opened vs closed per week, last 8 weeks ---
+    const now    = new Date();
+    const thisWk = weekStartUtc(now);
+    const weeks  = [];
+    for (let i = 7; i >= 0; i--) {
+      const start = new Date(thisWk);
+      start.setUTCDate(start.getUTCDate() - i * 7);
+      const end = new Date(start);
+      end.setUTCDate(end.getUTCDate() + 7);
+      weeks.push({
+        start,
+        end,
+        label: start.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', timeZone: 'UTC' }),
+        opened: 0,
+        closed: 0,
+      });
+    }
+    const bucketOf = (date) => weeks.find(w => date >= w.start && date < w.end);
+
+    // Opened = bug creation date.
+    for (const row of db.prepare('SELECT created_at FROM bugs').all()) {
+      const d = parseUtc(row.created_at);
+      if (d) { const w = bucketOf(d); if (w) w.opened++; }
+    }
+    // Closed = status transitions to a terminal state (Resolved / Closed).
+    for (const row of db.prepare(`
+      SELECT created_at FROM bug_activity
+      WHERE action = 'status_change' AND new_value IN ('Resolved','Closed')
+    `).all()) {
+      const d = parseUtc(row.created_at);
+      if (d) { const w = bucketOf(d); if (w) w.closed++; }
+    }
+    const bugsWeekly = weeks.map(w => ({ week: w.label, opened: w.opened, closed: w.closed }));
+
+    // --- 3. Test coverage by status (all five buckets, zero-filled) ---
+    const STATUSES = ['Draft', 'Ready', 'Passed', 'Failed', 'Skipped'];
+    const counts = Object.fromEntries(STATUSES.map(s => [s, 0]));
+    for (const row of db.prepare('SELECT status, COUNT(*) c FROM test_cases GROUP BY status').all()) {
+      if (row.status in counts) counts[row.status] = row.c;
+    }
+    const coverageByStatus = STATUSES.map(status => ({ status, count: counts[status] }));
+
+    res.json({
+      success: true,
+      data: { passRateTrend, bugsWeekly, coverageByStatus },
+      error: null,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, data: null, error: err.message });
+  }
+}
+
 router.get('/metrics', handleGetMetrics);
+router.get('/trends',  handleGetTrends);
 
 module.exports = router;

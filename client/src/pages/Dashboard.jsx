@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { PassRateTrendChart, BugsWeeklyChart, CoverageDonutChart, ChartSkeleton } from '../components/DashboardCharts';
 
 const REFRESH_MS = 30000;
 
@@ -104,6 +105,7 @@ function LoadingSkeleton() {
 export default function Dashboard() {
   const navigate = useNavigate();
   const [data,    setData]    = useState(null);
+  const [trends,  setTrends]  = useState(null);
   const [loading, setLoading] = useState(true);   // only true on the very first load
   const [error,   setError]   = useState('');
   const [updatedAt, setUpdatedAt] = useState(null);
@@ -111,15 +113,20 @@ export default function Dashboard() {
 
   async function fetchMetrics() {
     try {
-      const res  = await fetch('/api/dashboard/metrics');
-      const json = await res.json();
-      if (json.success) {
-        setData(json.data);
+      const [mRes, tRes] = await Promise.all([
+        fetch('/api/dashboard/metrics'),
+        fetch('/api/dashboard/trends'),
+      ]);
+      const mJson = await mRes.json();
+      const tJson = await tRes.json();
+      if (mJson.success) {
+        setData(mJson.data);
         setError('');
         setUpdatedAt(new Date());
       } else {
-        setError(json.error || 'Failed to load dashboard data.');
+        setError(mJson.error || 'Failed to load dashboard data.');
       }
+      if (tJson.success) setTrends(tJson.data);
     } catch {
       setError('Could not reach the server. Check your connection and try again.');
     } finally {
@@ -285,6 +292,28 @@ export default function Dashboard() {
                 </ul>
               )}
             </div>
+          </div>
+
+          {/* --- Insights: trend, bug flow & coverage --- */}
+          <div style={{ marginTop: 28 }}>
+            <h2 style={{ margin: '0 0 14px', fontSize: 16, fontWeight: 700, color: '#0f172a' }}>Insights</h2>
+            {!trends ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                <ChartSkeleton />
+                <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
+                  <ChartSkeleton wide />
+                  <ChartSkeleton />
+                </div>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                <PassRateTrendChart data={trends.passRateTrend} />
+                <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', alignItems: 'stretch' }}>
+                  <BugsWeeklyChart data={trends.bugsWeekly} />
+                  <CoverageDonutChart data={trends.coverageByStatus} />
+                </div>
+              </div>
+            )}
           </div>
         </>
       )}
