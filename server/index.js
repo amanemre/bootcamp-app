@@ -10,6 +10,9 @@ const seed = require('./seed');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// CSV import accepts a larger JSON body (raw CSV text); scope the bigger limit
+// to those routes only and keep the conservative 100kb default everywhere else.
+app.use('/api/test-cases/import', express.json({ limit: '2mb' }));
 app.use(express.json());
 
 seed();

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Plus, Pencil, Trash2, MoreVertical, ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Plus, Upload, Download, Pencil, Trash2, MoreVertical, ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
 import TestCaseModal from '../components/TestCaseModal';
 
 const SEVERITY_STYLES = {
@@ -40,6 +41,7 @@ function formatDate(str) {
 }
 
 export default function TestCases() {
+  const navigate = useNavigate();
   const [items, setItems] = useState([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -88,6 +90,19 @@ export default function TestCases() {
     setPage(1);
   }
 
+  // Export the current filtered set (all matching rows, not just this page).
+  // The server sets the filename; an anchor download respects it.
+  function handleExport() {
+    const params = new URLSearchParams({ sort, order });
+    if (statusFilter)    params.set('status', statusFilter);
+    if (debouncedSearch) params.set('search', debouncedSearch);
+    const a = document.createElement('a');
+    a.href = `/api/test-cases/export?${params}`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
   async function handleDelete(id) {
     if (!confirm('Delete this test case? This cannot be undone.')) return;
     setOpenMenuId(null);
@@ -100,12 +115,27 @@ export default function TestCases() {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
         <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700 }}>Test Cases</h1>
-        <button
-          onClick={() => { setEditTarget(null); setModalOpen(true); }}
-          style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#2563eb', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: 6, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}
-        >
-          <Plus size={15} /> New Test Case
-        </button>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button
+            onClick={handleExport}
+            title="Export the current filtered set to CSV"
+            style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#fff', color: '#374151', border: '1px solid #d1d5db', padding: '8px 16px', borderRadius: 6, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}
+          >
+            <Download size={15} /> Download CSV
+          </button>
+          <button
+            onClick={() => navigate('/test-cases/import')}
+            style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#fff', color: '#374151', border: '1px solid #d1d5db', padding: '8px 16px', borderRadius: 6, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}
+          >
+            <Upload size={15} /> Import CSV
+          </button>
+          <button
+            onClick={() => { setEditTarget(null); setModalOpen(true); }}
+            style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#2563eb', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: 6, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}
+          >
+            <Plus size={15} /> New Test Case
+          </button>
+        </div>
       </div>
 
       {/* Toolbar */}
