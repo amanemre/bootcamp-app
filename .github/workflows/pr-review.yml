@@ -30,12 +30,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
-          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
         run: |
           export PATH="$HOME/.local/bin:$PATH"
-
-          echo "=== claude version ==="
-          claude --version
 
           echo "=== auth status ==="
           claude auth status 2>&1 || true
@@ -53,21 +49,17 @@ jobs:
             printf 'Write in direct, active voice.\n\nDiff:\n'
             cat /tmp/pr-diff.txt
           } > /tmp/prompt.txt
-          echo "prompt: $(wc -c < /tmp/prompt.txt) bytes"
 
           echo "=== running claude -p ==="
           set +e
           claude -p --output-format text "$(cat /tmp/prompt.txt)" > /tmp/review.txt 2>/tmp/claude-err.txt
           CLAUDE_EXIT=$?
-          echo "claude exit code: $CLAUDE_EXIT"
-          echo "--- stdout ---"
-          cat /tmp/review.txt
-          echo "--- stderr ---"
+          echo "exit code: $CLAUDE_EXIT"
           cat /tmp/claude-err.txt
           set -e
 
           if [ $CLAUDE_EXIT -ne 0 ]; then
-            echo "claude -p failed, check stderr above"
+            echo "claude -p failed"
             exit 1
           fi
 
