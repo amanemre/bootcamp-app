@@ -17,19 +17,11 @@ jobs:
       - name: Install Claude Code
         run: curl -fsSL https://claude.ai/install.sh | bash -s -- 2.1.183
 
-      - name: Write Claude credentials
-        run: |
-          mkdir -p ~/.claude
-          printf '{"claudeAiOauth":{"accessToken":"%s","expiresAt":9999999999}}' \
-            "$CLAUDE_CODE_OAUTH_TOKEN" > ~/.claude/.credentials.json
-          chmod 600 ~/.claude/.credentials.json
-        env:
-          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-
       - name: QA review
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
         run: |
           export PATH="$HOME/.local/bin:$PATH"
 
@@ -55,13 +47,10 @@ jobs:
           claude -p --output-format text "$(cat /tmp/prompt.txt)" > /tmp/review.txt 2>/tmp/claude-err.txt
           CLAUDE_EXIT=$?
           echo "exit code: $CLAUDE_EXIT"
-          cat /tmp/claude-err.txt
+          [ -s /tmp/claude-err.txt ] && cat /tmp/claude-err.txt
           set -e
 
-          if [ $CLAUDE_EXIT -ne 0 ]; then
-            echo "claude -p failed"
-            exit 1
-          fi
+          [ $CLAUDE_EXIT -ne 0 ] && exit 1
 
           echo "=== posting comment ==="
           gh pr comment "$PR_NUMBER" --body "$(cat /tmp/review.txt)"
