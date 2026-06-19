@@ -34,6 +34,12 @@ export default function AddCasesModal({ currentCaseIds, onClose, onAdd }) {
       });
   }, []);
 
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
   const filtered = allCases.filter(tc =>
     tc.title.toLowerCase().includes(search.toLowerCase())
   );
@@ -52,12 +58,12 @@ export default function AddCasesModal({ currentCaseIds, onClose, onAdd }) {
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 16 }}>
-      <div style={{ background: 'var(--surface)', borderRadius: 10, width: '100%', maxWidth: 560, maxHeight: '80vh', display: 'flex', flexDirection: 'column' }}>
+      <div role="dialog" aria-modal="true" aria-labelledby="add-cases-title" style={{ background: 'var(--surface)', borderRadius: 10, width: '100%', maxWidth: 560, maxHeight: '80vh', display: 'flex', flexDirection: 'column' }}>
 
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 24px 14px', borderBottom: '1px solid var(--border)' }}>
-          <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>Add Test Cases</h2>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-faint)', display: 'flex', padding: 4 }}>
+          <h2 id="add-cases-title" style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>Add Test Cases</h2>
+          <button aria-label="Close" onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-faint)', display: 'flex', padding: 4 }}>
             <X size={20} />
           </button>
         </div>
@@ -70,6 +76,7 @@ export default function AddCasesModal({ currentCaseIds, onClose, onAdd }) {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search by title…"
+              aria-label="Search test cases by title"
               autoFocus
               style={{ width: '100%', padding: '7px 10px 7px 30px', borderRadius: 6, border: '1px solid var(--border)', fontSize: 14, boxSizing: 'border-box' }}
             />
@@ -104,6 +111,7 @@ export default function AddCasesModal({ currentCaseIds, onClose, onAdd }) {
                 checked={selected.has(tc.id)}
                 onChange={() => toggle(tc.id)}
                 onClick={e => e.stopPropagation()}
+                aria-label={tc.title}
                 style={{ flexShrink: 0, cursor: 'pointer', width: 15, height: 15 }}
               />
               <span style={{ flex: 1, fontSize: 14, color: 'var(--text)' }}>{tc.title}</span>

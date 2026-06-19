@@ -112,7 +112,7 @@ export default function TestCases() {
   }
 
   return (
-    <div style={{ padding: '24px 32px', maxWidth: 1100, margin: '0 auto' }}>
+    <main style={{ padding: '24px 32px', maxWidth: 1100, margin: '0 auto' }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
         <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700 }}>Test Cases</h1>
@@ -143,12 +143,14 @@ export default function TestCases() {
       <div style={{ display: 'flex', gap: 10, marginBottom: 16 }}>
         <input
           type="text"
+          aria-label="Search test cases by title"
           placeholder="Search by title…"
           value={search}
           onChange={e => setSearch(e.target.value)}
           style={{ flex: 1, padding: '8px 12px', borderRadius: 6, border: '1px solid var(--border)', fontSize: 14 }}
         />
         <select
+          aria-label="Filter by status"
           value={statusFilter}
           onChange={e => { setStatusFilter(e.target.value); setPage(1); }}
           style={{ padding: '8px 12px', borderRadius: 6, border: '1px solid var(--border)', fontSize: 14, minWidth: 160, background: 'var(--surface)' }}
@@ -196,6 +198,7 @@ export default function TestCases() {
                   <td style={{ ...td, color: 'var(--text-faint)', fontSize: 13 }}>{formatDate(item.updated_at)}</td>
                   <td style={{ ...td, position: 'relative' }} onClick={e => e.stopPropagation()}>
                     <button
+                      aria-label={`Options for ${item.title}`}
                       onClick={e => { e.stopPropagation(); setOpenMenuId(openMenuId === item.id ? null : item.id); }}
                       style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px 6px', color: 'var(--text-faint)', borderRadius: 4, display: 'flex' }}
                     >
@@ -237,7 +240,7 @@ export default function TestCases() {
           onSaved={() => { setModalOpen(false); setEditTarget(null); fetchData(); }}
         />
       )}
-    </div>
+    </main>
   );
 }
 

@@ -42,7 +42,7 @@ export default function TestRuns() {
   useEffect(() => { fetchRuns(); }, []);
 
   return (
-    <div style={{ padding: '24px 32px', maxWidth: 1100, margin: '0 auto' }}>
+    <main style={{ padding: '24px 32px', maxWidth: 1100, margin: '0 auto' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
         <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700 }}>Test Runs</h1>
       </div>
@@ -98,7 +98,7 @@ export default function TestRuns() {
       <div style={{ marginTop: 12, fontSize: 13, color: 'var(--canvas-muted)' }}>
         {runs.length} run{runs.length !== 1 ? 's' : ''}
       </div>
-    </div>
+    </main>
   );
 }
 

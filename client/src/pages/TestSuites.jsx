@@ -50,7 +50,7 @@ export default function TestSuites() {
   useEffect(() => { fetchSuites(); }, [statusFilter]);
 
   return (
-    <div style={{ padding: '24px 32px', maxWidth: 1100, margin: '0 auto' }}>
+    <main style={{ padding: '24px 32px', maxWidth: 1100, margin: '0 auto' }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
         <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700 }}>Test Suites</h1>
@@ -65,6 +65,7 @@ export default function TestSuites() {
       {/* Filter */}
       <div style={{ marginBottom: 16 }}>
         <select
+          aria-label="Filter by status"
           value={statusFilter}
           onChange={e => setStatusFilter(e.target.value)}
           style={{ padding: '8px 12px', borderRadius: 6, border: '1px solid var(--border)', fontSize: 14, background: 'var(--surface)' }}
@@ -129,7 +130,7 @@ export default function TestSuites() {
           onSaved={() => { setModalOpen(false); fetchSuites(); }}
         />
       )}
-    </div>
+    </main>
   );
 }
 

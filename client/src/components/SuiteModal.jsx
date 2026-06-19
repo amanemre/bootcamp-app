@@ -19,6 +19,12 @@ export default function SuiteModal({ initialData, onClose, onSaved }) {
     setServerError('');
   }, [initialData]);
 
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
   const set = field => e => {
     setForm(f => ({ ...f, [field]: e.target.value }));
     setErrors(prev => ({ ...prev, [field]: '' }));
@@ -52,12 +58,12 @@ export default function SuiteModal({ initialData, onClose, onSaved }) {
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 16 }}>
-      <div style={{ background: 'var(--surface)', borderRadius: 10, width: '100%', maxWidth: 460, padding: 28 }}>
+      <div role="dialog" aria-modal="true" aria-labelledby="suite-modal-title" style={{ background: 'var(--surface)', borderRadius: 10, width: '100%', maxWidth: 460, padding: 28 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 22 }}>
-          <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>
+          <h2 id="suite-modal-title" style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>
             {initialData ? 'Edit Suite' : 'New Suite'}
           </h2>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-faint)', padding: 4, display: 'flex' }}>
+          <button aria-label="Close" onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-faint)', padding: 4, display: 'flex' }}>
             <X size={20} />
           </button>
         </div>
@@ -69,14 +75,14 @@ export default function SuiteModal({ initialData, onClose, onSaved }) {
         )}
 
         <form onSubmit={handleSubmit}>
-          <Field label="Name *" error={errors.name}>
-            <input value={form.name} onChange={set('name')} style={fieldInp(errors.name)} placeholder="e.g. Authentication Suite" />
+          <Field label="Name *" error={errors.name} htmlFor="suite-name">
+            <input id="suite-name" value={form.name} onChange={set('name')} style={fieldInp(errors.name)} placeholder="e.g. Authentication Suite" />
           </Field>
-          <Field label="Feature *" error={errors.feature}>
-            <input value={form.feature} onChange={set('feature')} style={fieldInp(errors.feature)} placeholder="e.g. User Authentication" />
+          <Field label="Feature *" error={errors.feature} htmlFor="suite-feature">
+            <input id="suite-feature" value={form.feature} onChange={set('feature')} style={fieldInp(errors.feature)} placeholder="e.g. User Authentication" />
           </Field>
-          <Field label="Status">
-            <select value={form.status} onChange={set('status')} style={fieldInp()}>
+          <Field label="Status" htmlFor="suite-status">
+            <select id="suite-status" value={form.status} onChange={set('status')} style={fieldInp()}>
               {STATUSES.map(s => <option key={s}>{s}</option>)}
             </select>
           </Field>
@@ -97,10 +103,10 @@ export default function SuiteModal({ initialData, onClose, onSaved }) {
   );
 }
 
-function Field({ label, children, error }) {
+function Field({ label, children, error, htmlFor }) {
   return (
     <div style={{ marginBottom: 14 }}>
-      <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 5 }}>{label}</label>
+      <label htmlFor={htmlFor} style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 5 }}>{label}</label>
       {children}
       {error && <p style={{ margin: '4px 0 0', fontSize: 12, color: '#dc2626' }}>{error}</p>}
     </div>

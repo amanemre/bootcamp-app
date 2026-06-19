@@ -94,21 +94,21 @@ export default function ReportDetail() {
     }
   }
 
-  if (loading)    return <div style={{ padding: '48px 32px', textAlign: 'center', color: 'var(--text-faint)' }}>Loading…</div>;
-  if (notFound)   return <div style={{ padding: '48px 32px', textAlign: 'center', color: 'var(--text-faint)' }}>Report not found.</div>;
+  if (loading)    return <main style={{ padding: '48px 32px', textAlign: 'center', color: 'var(--text-faint)' }}>Loading…</main>;
+  if (notFound)   return <main style={{ padding: '48px 32px', textAlign: 'center', color: 'var(--text-faint)' }}>Report not found.</main>;
   if (fetchError) return (
-    <div style={{ padding: '32px', maxWidth: 900, margin: '0 auto' }}>
+    <main style={{ padding: '32px', maxWidth: 900, margin: '0 auto' }}>
       <div style={{ background: '#fee2e2', color: '#dc2626', padding: '14px 18px', borderRadius: 6, fontSize: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <span>{fetchError}</span>
         <button onClick={fetchReport} style={{ background: 'none', border: '1px solid #dc2626', borderRadius: 4, color: '#dc2626', cursor: 'pointer', padding: '3px 10px', fontSize: 13 }}>Retry</button>
       </div>
-    </div>
+    </main>
   );
 
   const results = report.results ?? [];
 
   return (
-    <div style={{ padding: '24px 32px', maxWidth: 900, margin: '0 auto' }}>
+    <main style={{ padding: '24px 32px', maxWidth: 900, margin: '0 auto' }}>
       <button onClick={() => navigate('/reports')} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--canvas-muted)', fontSize: 14, padding: 0, marginBottom: 20 }}>
         <ArrowLeft size={15} /> Back to Reports
       </button>
@@ -139,7 +139,7 @@ export default function ReportDetail() {
       {actionError && (
         <div style={{ background: '#fee2e2', color: '#dc2626', padding: '10px 14px', borderRadius: 6, marginBottom: 16, fontSize: 13, display: 'flex', justifyContent: 'space-between' }}>
           <span>{actionError}</span>
-          <button onClick={() => setActionError('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#dc2626', fontWeight: 700, fontSize: 16 }}>×</button>
+          <button aria-label="Dismiss error" onClick={() => setActionError('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#dc2626', fontWeight: 700, fontSize: 16 }}>×</button>
         </div>
       )}
 
@@ -192,7 +192,7 @@ export default function ReportDetail() {
         </table>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 

@@ -103,7 +103,7 @@ export default function ImportTestCases() {
   const validCount = preview?.summary.valid ?? 0;
 
   return (
-    <div style={{ padding: '24px 32px', maxWidth: 1000, margin: '0 auto' }}>
+    <main style={{ padding: '24px 32px', maxWidth: 1000, margin: '0 auto' }}>
       <button onClick={() => navigate('/test-cases')} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--canvas-muted)', fontSize: 14, padding: 0, marginBottom: 20 }}>
         <ArrowLeft size={15} /> Back to Test Cases
       </button>
@@ -119,7 +119,7 @@ export default function ImportTestCases() {
       {error && (
         <div style={{ background: '#fee2e2', color: '#dc2626', padding: '12px 16px', borderRadius: 6, marginBottom: 16, fontSize: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span>{error}</span>
-          <button onClick={() => setError('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#dc2626', fontWeight: 700, fontSize: 16 }}>×</button>
+          <button aria-label="Dismiss error" onClick={() => setError('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#dc2626', fontWeight: 700, fontSize: 16 }}>×</button>
         </div>
       )}
 
@@ -236,7 +236,7 @@ export default function ImportTestCases() {
           )}
         </>
       )}
-    </div>
+    </main>
   );
 }
 

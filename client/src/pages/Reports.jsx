@@ -32,7 +32,7 @@ export default function Reports() {
   useEffect(() => { fetchReports(); }, []);
 
   return (
-    <div style={{ padding: '24px 32px', maxWidth: 1100, margin: '0 auto' }}>
+    <main style={{ padding: '24px 32px', maxWidth: 1100, margin: '0 auto' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
         <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700 }}>Reports</h1>
       </div>
@@ -90,7 +90,7 @@ export default function Reports() {
       <div style={{ marginTop: 12, fontSize: 13, color: 'var(--canvas-muted)' }}>
         {reports.length} report{reports.length !== 1 ? 's' : ''}
       </div>
-    </div>
+    </main>
   );
 }
 

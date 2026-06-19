@@ -136,21 +136,21 @@ export default function BugDetail() {
     }
   }
 
-  if (loading)    return <div style={{ padding: '48px 32px', textAlign: 'center', color: 'var(--text-faint)' }}>Loading…</div>;
-  if (notFound)   return <div style={{ padding: '48px 32px', textAlign: 'center', color: 'var(--text-faint)' }}>Bug not found.</div>;
+  if (loading)    return <main style={{ padding: '48px 32px', textAlign: 'center', color: 'var(--text-faint)' }}>Loading…</main>;
+  if (notFound)   return <main style={{ padding: '48px 32px', textAlign: 'center', color: 'var(--text-faint)' }}>Bug not found.</main>;
   if (fetchError) return (
-    <div style={{ padding: '32px', maxWidth: 860, margin: '0 auto' }}>
+    <main style={{ padding: '32px', maxWidth: 860, margin: '0 auto' }}>
       <div style={{ background: '#fee2e2', color: '#dc2626', padding: '14px 18px', borderRadius: 6, fontSize: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <span>{fetchError}</span>
         <button onClick={fetchBug} style={{ background: 'none', border: '1px solid #dc2626', borderRadius: 4, color: '#dc2626', cursor: 'pointer', padding: '3px 10px', fontSize: 13 }}>Retry</button>
       </div>
-    </div>
+    </main>
   );
 
   const allowed = TRANSITIONS[bug.status] ?? [];
 
   return (
-    <div style={{ padding: '24px 32px', maxWidth: 860, margin: '0 auto' }}>
+    <main style={{ padding: '24px 32px', maxWidth: 860, margin: '0 auto' }}>
       {/* Back */}
       <button onClick={() => navigate('/bugs')} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--canvas-muted)', fontSize: 14, padding: 0, marginBottom: 20 }}>
         <ArrowLeft size={15} /> Back to Bugs
@@ -181,7 +181,7 @@ export default function BugDetail() {
       {actionError && (
         <div style={{ background: '#fee2e2', color: '#dc2626', padding: '10px 14px', borderRadius: 6, marginBottom: 20, fontSize: 13, display: 'flex', justifyContent: 'space-between' }}>
           <span>{actionError}</span>
-          <button onClick={() => setActionError('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#dc2626', fontWeight: 700, fontSize: 16 }}>×</button>
+          <button aria-label="Dismiss error" onClick={() => setActionError('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#dc2626', fontWeight: 700, fontSize: 16 }}>×</button>
         </div>
       )}
 
@@ -224,7 +224,7 @@ export default function BugDetail() {
           <p style={{ margin: 0, fontSize: 14, color: 'var(--text-faint)' }}>No further transitions available from <strong>{bug.status}</strong>.</p>
         ) : (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <select value={nextStatus} onChange={e => setNextStatus(e.target.value)} style={{ padding: '8px 12px', borderRadius: 6, border: '1px solid var(--border)', fontSize: 14, background: 'var(--surface)' }}>
+            <select aria-label="Select next status" value={nextStatus} onChange={e => setNextStatus(e.target.value)} style={{ padding: '8px 12px', borderRadius: 6, border: '1px solid var(--border)', fontSize: 14, background: 'var(--surface)' }}>
               <option value="">Select next status…</option>
               {allowed.map(s => <option key={s}>{s}</option>)}
             </select>
@@ -277,6 +277,7 @@ export default function BugDetail() {
         <form onSubmit={submitComment}>
           <h4 style={{ margin: '0 0 8px', fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)' }}>Add Comment</h4>
           <textarea
+            aria-label="Add a comment"
             value={comment}
             onChange={e => setComment(e.target.value)}
             placeholder="Write a comment…"
@@ -297,6 +298,6 @@ export default function BugDetail() {
           onSaved={updated => { setBug(b => ({ ...b, ...updated })); setEditOpen(false); }}
         />
       )}
-    </div>
+    </main>
   );
 }

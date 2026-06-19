@@ -72,7 +72,7 @@ export default function Bugs() {
   useEffect(() => { fetchBugs(); }, [statusFilter, sevFilter, debouncedQ]);
 
   return (
-    <div style={{ padding: '24px 32px', maxWidth: 1100, margin: '0 auto' }}>
+    <main style={{ padding: '24px 32px', maxWidth: 1100, margin: '0 auto' }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
         <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700 }}>Bugs</h1>
@@ -83,17 +83,17 @@ export default function Bugs() {
 
       {/* Filter bar */}
       <div style={{ display: 'flex', gap: 10, marginBottom: 16, flexWrap: 'wrap' }}>
-        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={sel}>
+        <select aria-label="Filter by status" value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={sel}>
           <option value="">All Statuses</option>
           {['Open', 'In Progress', 'Resolved', 'Closed', 'Reopened'].map(s => <option key={s}>{s}</option>)}
         </select>
-        <select value={sevFilter} onChange={e => setSevFilter(e.target.value)} style={sel}>
+        <select aria-label="Filter by severity" value={sevFilter} onChange={e => setSevFilter(e.target.value)} style={sel}>
           <option value="">All Severities</option>
           {['Critical', 'Major', 'Minor', 'Trivial'].map(s => <option key={s}>{s}</option>)}
         </select>
         <div style={{ position: 'relative', flex: 1, minWidth: 200 }}>
           <Search size={13} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-faint)', pointerEvents: 'none' }} />
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search title or description…" style={{ width: '100%', padding: '8px 10px 8px 30px', borderRadius: 6, border: '1px solid var(--border)', fontSize: 14, boxSizing: 'border-box' }} />
+          <input aria-label="Search bugs" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search title or description…" style={{ width: '100%', padding: '8px 10px 8px 30px', borderRadius: 6, border: '1px solid var(--border)', fontSize: 14, boxSizing: 'border-box' }} />
         </div>
       </div>
 
@@ -150,7 +150,7 @@ export default function Bugs() {
           onSaved={bug => { setModalOpen(false); navigate(`/bugs/${bug.id}`); }}
         />
       )}
-    </div>
+    </main>
   );
 }
 

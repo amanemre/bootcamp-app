@@ -66,7 +66,7 @@ export default function Nav() {
 
   return (
     <header ref={headerRef} style={{ position: 'sticky', top: 0, zIndex: 50 }}>
-      <nav style={{
+      <nav aria-label="Main navigation" style={{
         background: c.bg,
         borderBottom: `1px solid ${c.border}`,
         padding: '0 24px',

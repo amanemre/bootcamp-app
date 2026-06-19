@@ -65,6 +65,7 @@ function SortableCase({ item, onRemove }) {
       }}
     >
       <button
+        aria-label="Drag to reorder"
         {...attributes}
         {...listeners}
         style={{ background: 'none', border: 'none', cursor: 'grab', padding: '2px 4px', color: 'var(--text-faint)', display: 'flex', flexShrink: 0, touchAction: 'none' }}
@@ -75,6 +76,7 @@ function SortableCase({ item, onRemove }) {
       <Badge value={item.severity} map={SEVERITY_STYLES} />
       <Badge value={item.status} map={TC_STATUS_STYLES} />
       <button
+        aria-label="Remove from suite"
         onClick={() => onRemove(item.id)}
         style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-faint)', padding: '3px 5px', display: 'flex', borderRadius: 4, marginLeft: 4, flexShrink: 0 }}
         onMouseEnter={e => e.currentTarget.style.color = '#ef4444'}
@@ -207,19 +209,19 @@ export default function TestSuiteDetail() {
     }
   }
 
-  if (loading)   return <div style={{ padding: '48px 32px', textAlign: 'center', color: 'var(--text-faint)' }}>Loading…</div>;
-  if (notFound)  return <div style={{ padding: '48px 32px', textAlign: 'center', color: 'var(--text-faint)' }}>Suite not found.</div>;
+  if (loading)   return <main style={{ padding: '48px 32px', textAlign: 'center', color: 'var(--text-faint)' }}>Loading…</main>;
+  if (notFound)  return <main style={{ padding: '48px 32px', textAlign: 'center', color: 'var(--text-faint)' }}>Suite not found.</main>;
   if (fetchError) return (
-    <div style={{ padding: '48px 32px', maxWidth: 860, margin: '0 auto' }}>
+    <main style={{ padding: '48px 32px', maxWidth: 860, margin: '0 auto' }}>
       <div style={{ background: '#fee2e2', color: '#dc2626', padding: '14px 18px', borderRadius: 6, fontSize: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <span>{fetchError}</span>
         <button onClick={fetchSuite} style={{ background: 'none', border: '1px solid #dc2626', borderRadius: 4, color: '#dc2626', cursor: 'pointer', padding: '3px 10px', fontSize: 13 }}>Retry</button>
       </div>
-    </div>
+    </main>
   );
 
   return (
-    <div style={{ padding: '24px 32px', maxWidth: 860, margin: '0 auto' }}>
+    <main style={{ padding: '24px 32px', maxWidth: 860, margin: '0 auto' }}>
       {/* Back */}
       <button
         onClick={() => navigate('/test-suites')}
@@ -265,7 +267,7 @@ export default function TestSuiteDetail() {
       {saveError && (
         <div style={{ background: '#fee2e2', color: '#dc2626', padding: '10px 16px', borderRadius: 6, marginBottom: 20, fontSize: 13, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span>{saveError}</span>
-          <button onClick={() => setSaveError('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#dc2626', fontWeight: 700, fontSize: 16, lineHeight: 1, padding: '0 4px' }}>×</button>
+          <button aria-label="Dismiss error" onClick={() => setSaveError('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#dc2626', fontWeight: 700, fontSize: 16, lineHeight: 1, padding: '0 4px' }}>×</button>
         </div>
       )}
 
@@ -318,6 +320,6 @@ export default function TestSuiteDetail() {
           onAdd={selected => { setAddOpen(false); handleAddCases(selected); }}
         />
       )}
-    </div>
+    </main>
   );
 }

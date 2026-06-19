@@ -92,6 +92,7 @@ function ResultRow({ r, onUpdate, saving }) {
       </div>
 
       <input
+        aria-label="Notes for this test case"
         value={notes}
         onChange={e => setNotes(e.target.value)}
         onBlur={() => { if (notes !== (r.notes || '')) onUpdate(r.id, r.result === 'pending' ? null : r.result, notes); }}
@@ -187,21 +188,21 @@ export default function TestRunDetail() {
     }
   }
 
-  if (loading)    return <div style={{ padding: '48px 32px', textAlign: 'center', color: 'var(--text-faint)' }}>Loading…</div>;
-  if (notFound)   return <div style={{ padding: '48px 32px', textAlign: 'center', color: 'var(--text-faint)' }}>Run not found.</div>;
+  if (loading)    return <main style={{ padding: '48px 32px', textAlign: 'center', color: 'var(--text-faint)' }}>Loading…</main>;
+  if (notFound)   return <main style={{ padding: '48px 32px', textAlign: 'center', color: 'var(--text-faint)' }}>Run not found.</main>;
   if (fetchError) return (
-    <div style={{ padding: '32px', maxWidth: 860, margin: '0 auto' }}>
+    <main style={{ padding: '32px', maxWidth: 860, margin: '0 auto' }}>
       <div style={{ background: '#fee2e2', color: '#dc2626', padding: '14px 18px', borderRadius: 6, fontSize: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <span>{fetchError}</span>
         <button onClick={fetchRun} style={{ background: 'none', border: '1px solid #dc2626', borderRadius: 4, color: '#dc2626', cursor: 'pointer', padding: '3px 10px', fontSize: 13 }}>Retry</button>
       </div>
-    </div>
+    </main>
   );
 
   const total = run.results?.length ?? 0;
 
   return (
-    <div style={{ padding: '24px 32px', maxWidth: 900, margin: '0 auto' }}>
+    <main style={{ padding: '24px 32px', maxWidth: 900, margin: '0 auto' }}>
       <button onClick={() => navigate('/test-runs')} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--canvas-muted)', fontSize: 14, padding: 0, marginBottom: 20 }}>
         <ArrowLeft size={15} /> Back to Test Runs
       </button>
@@ -230,7 +231,7 @@ export default function TestRunDetail() {
       {generateError && (
         <div style={{ background: '#fee2e2', color: '#dc2626', padding: '10px 14px', borderRadius: 6, marginBottom: 16, fontSize: 13, display: 'flex', justifyContent: 'space-between' }}>
           <span>{generateError}</span>
-          <button onClick={() => setGenerateError('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#dc2626', fontWeight: 700, fontSize: 16 }}>×</button>
+          <button aria-label="Dismiss error" onClick={() => setGenerateError('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#dc2626', fontWeight: 700, fontSize: 16 }}>×</button>
         </div>
       )}
 
@@ -246,13 +247,13 @@ export default function TestRunDetail() {
       {actionError && (
         <div style={{ background: '#fee2e2', color: '#dc2626', padding: '10px 14px', borderRadius: 6, marginBottom: 16, fontSize: 13, display: 'flex', justifyContent: 'space-between' }}>
           <span>{actionError}</span>
-          <button onClick={() => setActionError('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#dc2626', fontWeight: 700, fontSize: 16 }}>×</button>
+          <button aria-label="Dismiss error" onClick={() => setActionError('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#dc2626', fontWeight: 700, fontSize: 16 }}>×</button>
         </div>
       )}
 
       {(run.results ?? []).map(r => (
         <ResultRow key={r.id} r={r} onUpdate={handleUpdateResult} saving={saving} />
       ))}
-    </div>
+    </main>
   );
 }

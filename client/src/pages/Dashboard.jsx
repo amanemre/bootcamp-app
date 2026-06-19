@@ -146,24 +146,24 @@ export default function Dashboard() {
   // --- First-load skeleton ---
   if (loading) {
     return (
-      <div style={wrap}>
+      <main style={wrap}>
         <style>{keyframes}</style>
         <h1 style={{ margin: '0 0 20px', fontSize: 22, fontWeight: 700 }}>Dashboard</h1>
         <LoadingSkeleton />
-      </div>
+      </main>
     );
   }
 
   // --- Error state (only when we have no data to show at all) ---
   if (error && !data) {
     return (
-      <div style={wrap}>
+      <main style={wrap}>
         <h1 style={{ margin: '0 0 20px', fontSize: 22, fontWeight: 700 }}>Dashboard</h1>
         <div style={{ background: '#fee2e2', color: '#dc2626', padding: '16px 20px', borderRadius: 8, fontSize: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span>{error}</span>
           <button onClick={fetchMetrics} style={{ background: 'none', border: '1px solid #dc2626', borderRadius: 4, color: '#dc2626', cursor: 'pointer', padding: '4px 12px', fontSize: 13 }}>Retry</button>
         </div>
-      </div>
+      </main>
     );
   }
 
@@ -171,7 +171,7 @@ export default function Dashboard() {
   const isEmpty = metrics.totalTestCases === 0 && recentRuns.length === 0 && recentActivity.length === 0;
 
   return (
-    <div style={wrap}>
+    <main style={wrap}>
       <style>{keyframes}</style>
 
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 20 }}>
@@ -320,7 +320,7 @@ export default function Dashboard() {
           </div>
         </>
       )}
-    </div>
+    </main>
   );
 }
 

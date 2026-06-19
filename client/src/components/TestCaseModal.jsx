@@ -15,6 +15,12 @@ export default function TestCaseModal({ initialData, onClose, onSaved }) {
     setServerError('');
   }, [initialData]);
 
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
   const set = field => e => {
     setForm(f => ({ ...f, [field]: e.target.value }));
     setErrors(prev => ({ ...prev, [field]: '' }));
@@ -53,12 +59,12 @@ export default function TestCaseModal({ initialData, onClose, onSaved }) {
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 16 }}>
-      <div style={{ background: 'var(--surface)', borderRadius: 10, width: '100%', maxWidth: 580, maxHeight: '92vh', overflowY: 'auto', padding: 28 }}>
+      <div role="dialog" aria-modal="true" aria-labelledby="tc-modal-title" style={{ background: 'var(--surface)', borderRadius: 10, width: '100%', maxWidth: 580, maxHeight: '92vh', overflowY: 'auto', padding: 28 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 22 }}>
-          <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>
+          <h2 id="tc-modal-title" style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>
             {initialData ? 'Edit Test Case' : 'New Test Case'}
           </h2>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-faint)', padding: 4, display: 'flex' }}>
+          <button aria-label="Close" onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-faint)', padding: 4, display: 'flex' }}>
             <X size={20} />
           </button>
         </div>
@@ -70,33 +76,33 @@ export default function TestCaseModal({ initialData, onClose, onSaved }) {
         )}
 
         <form onSubmit={handleSubmit}>
-          <Field label="Title *" error={errors.title}>
-            <input value={form.title} onChange={set('title')} style={fieldInp(errors.title)} placeholder="Concise, action-oriented title" />
+          <Field label="Title *" error={errors.title} htmlFor="tc-title">
+            <input id="tc-title" value={form.title} onChange={set('title')} style={fieldInp(errors.title)} placeholder="Concise, action-oriented title" />
           </Field>
 
-          <Field label="Preconditions">
-            <textarea value={form.preconditions} onChange={set('preconditions')} rows={3} style={fieldInp()}
+          <Field label="Preconditions" htmlFor="tc-preconditions">
+            <textarea id="tc-preconditions" value={form.preconditions} onChange={set('preconditions')} rows={3} style={fieldInp()}
               placeholder="State or data required before this test runs (optional)" />
           </Field>
 
-          <Field label="Steps * — one per line" error={errors.steps}>
-            <textarea value={form.steps} onChange={set('steps')} rows={5} style={fieldInp(errors.steps)}
+          <Field label="Steps * — one per line" error={errors.steps} htmlFor="tc-steps">
+            <textarea id="tc-steps" value={form.steps} onChange={set('steps')} rows={5} style={fieldInp(errors.steps)}
               placeholder={"Navigate to the login page.\nEnter a valid username.\nClick the Submit button."} />
           </Field>
 
-          <Field label="Expected Result *" error={errors.expected_result}>
-            <textarea value={form.expected_result} onChange={set('expected_result')} rows={4} style={fieldInp(errors.expected_result)}
+          <Field label="Expected Result *" error={errors.expected_result} htmlFor="tc-expected-result">
+            <textarea id="tc-expected-result" value={form.expected_result} onChange={set('expected_result')} rows={4} style={fieldInp(errors.expected_result)}
               placeholder="Describe the specific, observable outcome — avoid vague language like 'works correctly'." />
           </Field>
 
           <div style={{ display: 'flex', gap: 12 }}>
-            <Field label="Severity *" flex error={errors.severity}>
-              <select value={form.severity} onChange={set('severity')} style={fieldInp(errors.severity)}>
+            <Field label="Severity *" flex error={errors.severity} htmlFor="tc-severity">
+              <select id="tc-severity" value={form.severity} onChange={set('severity')} style={fieldInp(errors.severity)}>
                 {['Critical', 'Major', 'Minor', 'Trivial'].map(s => <option key={s}>{s}</option>)}
               </select>
             </Field>
-            <Field label="Status" flex>
-              <select value={form.status} onChange={set('status')} style={fieldInp()}>
+            <Field label="Status" flex htmlFor="tc-status">
+              <select id="tc-status" value={form.status} onChange={set('status')} style={fieldInp()}>
                 {['Draft', 'Ready', 'Passed', 'Failed', 'Skipped'].map(s => <option key={s}>{s}</option>)}
               </select>
             </Field>
@@ -118,10 +124,10 @@ export default function TestCaseModal({ initialData, onClose, onSaved }) {
   );
 }
 
-function Field({ label, children, flex, error }) {
+function Field({ label, children, flex, error, htmlFor }) {
   return (
     <div style={{ marginBottom: 14, flex: flex ? 1 : undefined }}>
-      <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 5 }}>{label}</label>
+      <label htmlFor={htmlFor} style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 5 }}>{label}</label>
       {children}
       {error && <p style={{ margin: '4px 0 0', fontSize: 12, color: '#dc2626' }}>{error}</p>}
     </div>

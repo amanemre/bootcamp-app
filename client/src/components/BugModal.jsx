@@ -33,6 +33,12 @@ export default function BugModal({ initialData, onClose, onSaved }) {
     setServerError('');
   }, [initialData, settings.default_severity_for_new_bugs]);
 
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
   const set = field => e => {
     setForm(f => ({ ...f, [field]: e.target.value }));
     setErrors(p => ({ ...p, [field]: '' }));
@@ -77,9 +83,9 @@ export default function BugModal({ initialData, onClose, onSaved }) {
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', zIndex: 1000, padding: '24px 16px', overflowY: 'auto' }}>
-      <div style={{ background: 'var(--surface)', borderRadius: 10, width: '100%', maxWidth: 580, padding: 28, marginBottom: 24 }}>
+      <div role="dialog" aria-modal="true" aria-labelledby="bug-modal-title" style={{ background: 'var(--surface)', borderRadius: 10, width: '100%', maxWidth: 580, padding: 28, marginBottom: 24 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 22 }}>
-          <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>{initialData ? 'Edit Bug' : 'New Bug'}</h2>
+          <h2 id="bug-modal-title" style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>{initialData ? 'Edit Bug' : 'New Bug'}</h2>
           <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-faint)', display: 'flex', padding: 4 }} aria-label="Close"><X size={20} /></button>
         </div>
 
@@ -88,43 +94,43 @@ export default function BugModal({ initialData, onClose, onSaved }) {
         )}
 
         <form onSubmit={handleSubmit}>
-          <Field label="Title *" error={errors.title}>
-            <input value={form.title} onChange={set('title')} style={inp(errors.title)} placeholder="Short description of the defect" maxLength={255} />
+          <Field label="Title *" error={errors.title} htmlFor="bug-title">
+            <input id="bug-title" value={form.title} onChange={set('title')} style={inp(errors.title)} placeholder="Short description of the defect" maxLength={255} />
           </Field>
 
-          <Field label="Description">
-            <textarea value={form.description} onChange={set('description')} style={{ ...inp(), height: 72, resize: 'vertical' }} placeholder="What is the context? Any additional detail?" />
+          <Field label="Description" htmlFor="bug-description">
+            <textarea id="bug-description" value={form.description} onChange={set('description')} style={{ ...inp(), height: 72, resize: 'vertical' }} placeholder="What is the context? Any additional detail?" />
           </Field>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-            <Field label="Severity *" error={errors.severity}>
-              <select value={form.severity} onChange={set('severity')} style={inp(errors.severity)}>
+            <Field label="Severity *" error={errors.severity} htmlFor="bug-severity">
+              <select id="bug-severity" value={form.severity} onChange={set('severity')} style={inp(errors.severity)}>
                 <option value="">Select severity…</option>
                 {SEVERITIES.map(s => <option key={s}>{s}</option>)}
               </select>
             </Field>
-            <Field label="Priority">
-              <select value={form.priority} onChange={set('priority')} style={inp()}>
+            <Field label="Priority" htmlFor="bug-priority">
+              <select id="bug-priority" value={form.priority} onChange={set('priority')} style={inp()}>
                 {PRIORITIES.map(p => <option key={p}>{p}</option>)}
               </select>
             </Field>
           </div>
 
-          <Field label="Steps to Reproduce" hint="One step per line">
-            <textarea value={form.steps} onChange={set('steps')} style={{ ...inp(), height: 96, resize: 'vertical', fontFamily: 'inherit' }} placeholder={'1. Go to /login\n2. Leave password blank\n3. Click Submit'} />
+          <Field label="Steps to Reproduce" hint="One step per line" htmlFor="bug-steps">
+            <textarea id="bug-steps" value={form.steps} onChange={set('steps')} style={{ ...inp(), height: 96, resize: 'vertical', fontFamily: 'inherit' }} placeholder={'1. Go to /login\n2. Leave password blank\n3. Click Submit'} />
           </Field>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-            <Field label="Expected Result">
-              <textarea value={form.expected} onChange={set('expected')} style={{ ...inp(), height: 72, resize: 'vertical' }} placeholder="What should have happened?" />
+            <Field label="Expected Result" htmlFor="bug-expected">
+              <textarea id="bug-expected" value={form.expected} onChange={set('expected')} style={{ ...inp(), height: 72, resize: 'vertical' }} placeholder="What should have happened?" />
             </Field>
-            <Field label="Actual Result">
-              <textarea value={form.actual} onChange={set('actual')} style={{ ...inp(), height: 72, resize: 'vertical' }} placeholder="What actually happened?" />
+            <Field label="Actual Result" htmlFor="bug-actual">
+              <textarea id="bug-actual" value={form.actual} onChange={set('actual')} style={{ ...inp(), height: 72, resize: 'vertical' }} placeholder="What actually happened?" />
             </Field>
           </div>
 
-          <Field label="Environment">
-            <input value={form.environment} onChange={set('environment')} style={inp()} placeholder="e.g. Chrome 125 / macOS 15 / v1.0.0" maxLength={255} />
+          <Field label="Environment" htmlFor="bug-environment">
+            <input id="bug-environment" value={form.environment} onChange={set('environment')} style={inp()} placeholder="e.g. Chrome 125 / macOS 15 / v1.0.0" maxLength={255} />
           </Field>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 24 }}>
@@ -139,10 +145,10 @@ export default function BugModal({ initialData, onClose, onSaved }) {
   );
 }
 
-function Field({ label, children, error, hint }) {
+function Field({ label, children, error, hint, htmlFor }) {
   return (
     <div style={{ marginBottom: 14 }}>
-      <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 4 }}>
+      <label htmlFor={htmlFor} style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 4 }}>
         {label}{hint && <span style={{ fontWeight: 400, color: 'var(--text-faint)', marginLeft: 6 }}>— {hint}</span>}
       </label>
       {children}

@@ -75,13 +75,13 @@ export default function Settings() {
   const subColor     = dark ? '#94a3b8' : '#6b7280';
 
   if (loading) {
-    return <div style={{ padding: '48px 32px', textAlign: 'center', color: subColor }}>Loading settings…</div>;
+    return <main style={{ padding: '48px 32px', textAlign: 'center', color: subColor }}>Loading settings…</main>;
   }
 
   const tzValue = form.timezone || browserTz;
 
   return (
-    <div style={{ padding: '24px 32px', maxWidth: 720, margin: '0 auto' }}>
+    <main style={{ padding: '24px 32px', maxWidth: 720, margin: '0 auto' }}>
       <h1 style={{ margin: '0 0 4px', fontSize: 22, fontWeight: 700, color: headingColor }}>Settings</h1>
       <p style={{ margin: '0 0 24px', fontSize: 14, color: subColor }}>Preferences are saved to your account and applied across the app.</p>
 
@@ -90,29 +90,29 @@ export default function Settings() {
       )}
 
       <Group title="Appearance" desc="Choose how the app looks. System follows your device setting.">
-        <Row label="Theme">
-          <Select value={form.theme} onChange={v => field('theme', v)}
+        <Row label="Theme" htmlFor="setting-theme">
+          <Select id="setting-theme" value={form.theme} onChange={v => field('theme', v)}
             options={THEMES.map(t => ({ value: t.value, label: t.label }))} />
         </Row>
       </Group>
 
       <Group title="Bug defaults" desc="Defaults applied when creating a new bug.">
-        <Row label="Default severity for new bugs">
-          <Select value={form.default_severity_for_new_bugs} onChange={v => field('default_severity_for_new_bugs', v)}
+        <Row label="Default severity for new bugs" htmlFor="setting-default-severity">
+          <Select id="setting-default-severity" value={form.default_severity_for_new_bugs} onChange={v => field('default_severity_for_new_bugs', v)}
             options={SEVERITIES.map(s => ({ value: s, label: s }))} />
         </Row>
       </Group>
 
       <Group title="Display" desc="How many rows list pages show per page.">
-        <Row label="Default page size">
-          <Select value={String(form.default_page_size)} onChange={v => field('default_page_size', Number(v))}
+        <Row label="Default page size" htmlFor="setting-page-size">
+          <Select id="setting-page-size" value={String(form.default_page_size)} onChange={v => field('default_page_size', Number(v))}
             options={PAGE_SIZES.map(n => ({ value: String(n), label: `${n} per page` }))} />
         </Row>
       </Group>
 
       <Group title="Localization" desc="Used when displaying dates and times.">
-        <Row label="Timezone">
-          <Select value={tzValue} onChange={v => field('timezone', v)}
+        <Row label="Timezone" htmlFor="setting-timezone">
+          <Select id="setting-timezone" value={tzValue} onChange={v => field('timezone', v)}
             options={TZ_OPTIONS.map(tz => ({ value: tz, label: tzLabel(tz) }))} />
         </Row>
       </Group>
@@ -139,7 +139,7 @@ export default function Settings() {
           </span>
         )}
       </div>
-    </div>
+    </main>
   );
 }
 
@@ -153,18 +153,18 @@ function Group({ title, desc, children }) {
   );
 }
 
-function Row({ label, children }) {
+function Row({ label, htmlFor, children }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
-      <label style={{ fontSize: 14, color: 'var(--text-secondary)', fontWeight: 500 }}>{label}</label>
+      <label htmlFor={htmlFor} style={{ fontSize: 14, color: 'var(--text-secondary)', fontWeight: 500 }}>{label}</label>
       {children}
     </div>
   );
 }
 
-function Select({ value, onChange, options }) {
+function Select({ id, value, onChange, options }) {
   return (
-    <select value={value} onChange={e => onChange(e.target.value)}
+    <select id={id} value={value} onChange={e => onChange(e.target.value)}
       style={{ padding: '8px 12px', borderRadius: 6, border: '1px solid var(--border)', fontSize: 14, minWidth: 200, background: 'var(--surface)', color: 'var(--text)', cursor: 'pointer' }}>
       {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
     </select>
