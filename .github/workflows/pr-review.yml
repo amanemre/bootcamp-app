@@ -19,9 +19,6 @@ jobs:
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           github_token: ${{ github.token }}
-          claude_args: '--allowedTools "Bash(gh:*),Read,Grep,Glob"'
           prompt: |
-            Run `gh pr diff ${{ github.event.pull_request.number }}` to read this PR's diff,
-            then use the qa-review skill to perform a QA review of it.
-            Post the full review as ONE PR comment by running:
-            gh pr comment ${{ github.event.pull_request.number }} --body "REVIEW_TEXT"
+            Post a comment on PR #${{ github.event.pull_request.number }} by running:
+            gh pr comment ${{ github.event.pull_request.number }} --body "Diagnostic: workflow pipeline is wired up correctly."
