@@ -22,3 +22,7 @@ jobs:
           prompt: |
             Post a comment on PR #${{ github.event.pull_request.number }} by running:
             gh pr comment ${{ github.event.pull_request.number }} --body "Diagnostic: workflow pipeline is wired up correctly."
+      - if: always()
+        run: |
+          echo "=== claude execution output ==="
+          cat /home/runner/work/_temp/claude-execution-output.json || echo "(file not found)"
