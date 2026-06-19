@@ -6,11 +6,11 @@ const SEV_STYLES = {
   Critical: { background: '#fee2e2', color: '#dc2626' },
   Major:    { background: '#ffedd5', color: '#ea580c' },
   Minor:    { background: '#fef9c3', color: '#854d0e' },
-  Trivial:  { background: '#f3f4f6', color: '#6b7280' },
+  Trivial:  { background: '#f3f4f6', color: '#4b5563' },
 };
 
 const RESULT_STYLES = {
-  pending:  { background: '#f3f4f6', color: '#6b7280'  },
+  pending:  { background: '#f3f4f6', color: '#4b5563'  },
   passed:   { background: '#dcfce7', color: '#16a34a'  },
   failed:   { background: '#fee2e2', color: '#dc2626'  },
   skipped:  { background: '#f3e8ff', color: '#7e22ce'  },
@@ -22,32 +22,28 @@ const STATUS_STYLES = {
 };
 
 function Badge({ value, map }) {
-  const s = map[value] ?? { background: '#f3f4f6', color: '#374151' };
+  const s = map[value] ?? { background: '#f3f4f6', color: '#4b5563' };
   const label = s.label ?? value;
   return <span style={{ padding: '2px 10px', borderRadius: 12, fontSize: 12, fontWeight: 600, background: s.background, color: s.color, whiteSpace: 'nowrap' }}>{label}</span>;
 }
 
-function formatDateTime(str) {
-  if (!str) return '—';
-  const d = new Date(str.replace(' ', 'T') + 'Z');
-  return d.toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
-}
+import { formatDateTimeShort as formatDateTime } from '../utils/datetime';
 
 function ProgressBar({ pass, fail, skip, total }) {
   if (!total) return null;
   const pct = n => `${Math.round((n / total) * 100)}%`;
   return (
     <div style={{ marginBottom: 24 }}>
-      <div style={{ display: 'flex', borderRadius: 6, overflow: 'hidden', height: 10, background: '#e5e7eb' }}>
+      <div style={{ display: 'flex', borderRadius: 6, overflow: 'hidden', height: 10, background: 'var(--border)' }}>
         <div style={{ width: pct(pass), background: '#16a34a', transition: 'width 0.3s' }} />
         <div style={{ width: pct(fail), background: '#dc2626', transition: 'width 0.3s' }} />
         <div style={{ width: pct(skip), background: '#7e22ce', transition: 'width 0.3s' }} />
       </div>
       <div style={{ display: 'flex', gap: 20, marginTop: 8, fontSize: 13 }}>
-        <span style={{ color: '#16a34a', fontWeight: 600 }}>{pass} passed</span>
-        <span style={{ color: '#dc2626', fontWeight: 600 }}>{fail} failed</span>
-        <span style={{ color: '#7e22ce', fontWeight: 600 }}>{skip} skipped</span>
-        <span style={{ color: '#9ca3af' }}>{total - pass - fail - skip} pending</span>
+        <span style={{ color: 'var(--status-pass)', fontWeight: 600 }}>{pass} passed</span>
+        <span style={{ color: 'var(--status-fail)', fontWeight: 600 }}>{fail} failed</span>
+        <span style={{ color: 'var(--status-skip)', fontWeight: 600 }}>{skip} skipped</span>
+        <span style={{ color: 'var(--text-faint)' }}>{total - pass - fail - skip} pending</span>
       </div>
     </div>
   );
@@ -61,16 +57,16 @@ function ResultRow({ r, onUpdate, saving }) {
   }
 
   return (
-    <div style={{ border: '1px solid #e5e7eb', borderRadius: 8, padding: 16, marginBottom: 10, background: '#fff' }}>
+    <div style={{ border: '1px solid var(--border)', borderRadius: 8, padding: 16, marginBottom: 10, background: 'var(--surface)' }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, marginBottom: 10 }}>
         <div style={{ flex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-            <span style={{ fontWeight: 600, fontSize: 14, color: '#111827' }}>{r.case_title ?? '(deleted case)'}</span>
+            <span style={{ fontWeight: 600, fontSize: 14, color: 'var(--text)' }}>{r.case_title ?? '(deleted case)'}</span>
             {r.severity && <Badge value={r.severity} map={SEV_STYLES} />}
             <Badge value={r.result} map={RESULT_STYLES} />
           </div>
           {r.expected_result && (
-            <p style={{ margin: '6px 0 0', fontSize: 12, color: '#6b7280', lineHeight: 1.5 }}>
+            <p style={{ margin: '6px 0 0', fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.5 }}>
               <strong>Expected:</strong> {r.expected_result}
             </p>
           )}
@@ -79,17 +75,17 @@ function ResultRow({ r, onUpdate, saving }) {
         <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
           <button onClick={() => mark('passed')} disabled={saving}
             title="Pass"
-            style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '6px 12px', borderRadius: 6, border: '1px solid #bbf7d0', background: r.result === 'passed' ? '#dcfce7' : '#fff', color: '#16a34a', cursor: 'pointer', fontSize: 13, fontWeight: 600, opacity: saving ? 0.6 : 1 }}>
+            style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '6px 12px', borderRadius: 6, border: '1px solid #bbf7d0', background: r.result === 'passed' ? '#dcfce7' : 'var(--surface)', color: '#16a34a', cursor: 'pointer', fontSize: 13, fontWeight: 600, opacity: saving ? 0.6 : 1 }}>
             <CheckCircle size={14} /> Pass
           </button>
           <button onClick={() => mark('failed')} disabled={saving}
             title="Fail"
-            style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '6px 12px', borderRadius: 6, border: '1px solid #fecaca', background: r.result === 'failed' ? '#fee2e2' : '#fff', color: '#dc2626', cursor: 'pointer', fontSize: 13, fontWeight: 600, opacity: saving ? 0.6 : 1 }}>
+            style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '6px 12px', borderRadius: 6, border: '1px solid #fecaca', background: r.result === 'failed' ? '#fee2e2' : 'var(--surface)', color: '#dc2626', cursor: 'pointer', fontSize: 13, fontWeight: 600, opacity: saving ? 0.6 : 1 }}>
             <XCircle size={14} /> Fail
           </button>
           <button onClick={() => mark('skipped')} disabled={saving}
             title="Skip"
-            style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '6px 12px', borderRadius: 6, border: '1px solid #e9d5ff', background: r.result === 'skipped' ? '#f3e8ff' : '#fff', color: '#7e22ce', cursor: 'pointer', fontSize: 13, fontWeight: 600, opacity: saving ? 0.6 : 1 }}>
+            style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '6px 12px', borderRadius: 6, border: '1px solid #e9d5ff', background: r.result === 'skipped' ? '#f3e8ff' : 'var(--surface)', color: '#7e22ce', cursor: 'pointer', fontSize: 13, fontWeight: 600, opacity: saving ? 0.6 : 1 }}>
             <MinusCircle size={14} /> Skip
           </button>
         </div>
@@ -100,12 +96,12 @@ function ResultRow({ r, onUpdate, saving }) {
         onChange={e => setNotes(e.target.value)}
         onBlur={() => { if (notes !== (r.notes || '')) onUpdate(r.id, r.result === 'pending' ? null : r.result, notes); }}
         placeholder="Notes (optional)…"
-        style={{ width: '100%', padding: '6px 10px', borderRadius: 5, border: '1px solid #e5e7eb', fontSize: 13, boxSizing: 'border-box', fontFamily: 'inherit', color: '#374151' }}
+        style={{ width: '100%', padding: '6px 10px', borderRadius: 5, border: '1px solid var(--border)', fontSize: 13, boxSizing: 'border-box', fontFamily: 'inherit', color: 'var(--text-secondary)' }}
       />
 
       {r.github_issue_url && (
         <a href={r.github_issue_url} target="_blank" rel="noreferrer"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 4, marginTop: 8, fontSize: 12, color: '#2563eb', textDecoration: 'none' }}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 4, marginTop: 8, fontSize: 12, color: 'var(--link)', textDecoration: 'none' }}
           onMouseEnter={e => e.currentTarget.style.textDecoration = 'underline'}
           onMouseLeave={e => e.currentTarget.style.textDecoration = 'none'}
         >
@@ -191,8 +187,8 @@ export default function TestRunDetail() {
     }
   }
 
-  if (loading)    return <div style={{ padding: '48px 32px', textAlign: 'center', color: '#9ca3af' }}>Loading…</div>;
-  if (notFound)   return <div style={{ padding: '48px 32px', textAlign: 'center', color: '#9ca3af' }}>Run not found.</div>;
+  if (loading)    return <div style={{ padding: '48px 32px', textAlign: 'center', color: 'var(--text-faint)' }}>Loading…</div>;
+  if (notFound)   return <div style={{ padding: '48px 32px', textAlign: 'center', color: 'var(--text-faint)' }}>Run not found.</div>;
   if (fetchError) return (
     <div style={{ padding: '32px', maxWidth: 860, margin: '0 auto' }}>
       <div style={{ background: '#fee2e2', color: '#dc2626', padding: '14px 18px', borderRadius: 6, fontSize: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -206,7 +202,7 @@ export default function TestRunDetail() {
 
   return (
     <div style={{ padding: '24px 32px', maxWidth: 900, margin: '0 auto' }}>
-      <button onClick={() => navigate('/test-runs')} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280', fontSize: 14, padding: 0, marginBottom: 20 }}>
+      <button onClick={() => navigate('/test-runs')} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--canvas-muted)', fontSize: 14, padding: 0, marginBottom: 20 }}>
         <ArrowLeft size={15} /> Back to Test Runs
       </button>
 
@@ -216,18 +212,18 @@ export default function TestRunDetail() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
             <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700 }}>{run.suite_name}</h1>
             <Badge value={run.status} map={STATUS_STYLES} />
-            {saving && <span style={{ fontSize: 12, color: '#9ca3af', fontStyle: 'italic' }}>Saving…</span>}
+            {saving && <span style={{ fontSize: 12, color: 'var(--text-faint)', fontStyle: 'italic' }}>Saving…</span>}
           </div>
           <button onClick={handleGenerateReport} disabled={generating}
             style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 6, border: 'none', background: '#2563eb', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600, flexShrink: 0, opacity: generating ? 0.6 : 1 }}>
             <FileText size={15} /> {generating ? 'Generating…' : 'Generate report'}
           </button>
         </div>
-        <div style={{ display: 'flex', gap: 16, fontSize: 13, color: '#6b7280', flexWrap: 'wrap' }}>
-          {run.feature && <span>Feature: <strong style={{ color: '#374151' }}>{run.feature}</strong></span>}
+        <div style={{ display: 'flex', gap: 16, fontSize: 13, color: 'var(--canvas-muted)', flexWrap: 'wrap' }}>
+          {run.feature && <span>Feature: <strong style={{ color: 'var(--canvas-strong)' }}>{run.feature}</strong></span>}
           <span>Started: {formatDateTime(run.start_time)}</span>
           {run.end_time && <span>Ended: {formatDateTime(run.end_time)}</span>}
-          {run.created_by && <span>By: <strong style={{ color: '#374151' }}>{run.created_by}</strong></span>}
+          {run.created_by && <span>By: <strong style={{ color: 'var(--canvas-strong)' }}>{run.created_by}</strong></span>}
         </div>
       </div>
 

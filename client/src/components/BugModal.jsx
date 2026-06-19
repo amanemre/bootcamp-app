@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
+import { useSettings } from '../context/SettingsContext';
 
 const BLANK = { title: '', description: '', severity: '', priority: 'Medium', steps: '', expected: '', actual: '', environment: '' };
 const SEVERITIES = ['Critical', 'Major', 'Minor', 'Trivial'];
 const PRIORITIES = ['Critical', 'High', 'Medium', 'Low'];
 
 export default function BugModal({ initialData, onClose, onSaved }) {
+  const { settings } = useSettings();
   const [form,        setForm]        = useState(BLANK);
   const [errors,      setErrors]      = useState({});
   const [serverError, setServerError] = useState('');
@@ -24,11 +26,12 @@ export default function BugModal({ initialData, onClose, onSaved }) {
         environment: initialData.environment ?? '',
       });
     } else {
-      setForm(BLANK);
+      // New bug: prefill severity from the user's default-severity preference.
+      setForm({ ...BLANK, severity: settings.default_severity_for_new_bugs || '' });
     }
     setErrors({});
     setServerError('');
-  }, [initialData]);
+  }, [initialData, settings.default_severity_for_new_bugs]);
 
   const set = field => e => {
     setForm(f => ({ ...f, [field]: e.target.value }));
@@ -74,10 +77,10 @@ export default function BugModal({ initialData, onClose, onSaved }) {
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', zIndex: 1000, padding: '24px 16px', overflowY: 'auto' }}>
-      <div style={{ background: '#fff', borderRadius: 10, width: '100%', maxWidth: 580, padding: 28, marginBottom: 24 }}>
+      <div style={{ background: 'var(--surface)', borderRadius: 10, width: '100%', maxWidth: 580, padding: 28, marginBottom: 24 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 22 }}>
           <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>{initialData ? 'Edit Bug' : 'New Bug'}</h2>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', display: 'flex', padding: 4 }} aria-label="Close"><X size={20} /></button>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-faint)', display: 'flex', padding: 4 }} aria-label="Close"><X size={20} /></button>
         </div>
 
         {serverError && (
@@ -125,7 +128,7 @@ export default function BugModal({ initialData, onClose, onSaved }) {
           </Field>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 24 }}>
-            <button type="button" onClick={onClose} style={{ padding: '8px 18px', borderRadius: 6, border: '1px solid #d1d5db', background: '#fff', cursor: 'pointer', fontSize: 14 }}>Cancel</button>
+            <button type="button" onClick={onClose} style={{ padding: '8px 18px', borderRadius: 6, border: '1px solid var(--border)', background: 'var(--surface)', cursor: 'pointer', fontSize: 14 }}>Cancel</button>
             <button type="submit" disabled={saving} style={{ padding: '8px 18px', borderRadius: 6, border: 'none', background: '#2563eb', color: '#fff', fontWeight: 600, fontSize: 14, cursor: saving ? 'default' : 'pointer', opacity: saving ? 0.7 : 1 }}>
               {saving ? 'Saving…' : initialData ? 'Save Changes' : 'Create Bug'}
             </button>
@@ -139,8 +142,8 @@ export default function BugModal({ initialData, onClose, onSaved }) {
 function Field({ label, children, error, hint }) {
   return (
     <div style={{ marginBottom: 14 }}>
-      <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 4 }}>
-        {label}{hint && <span style={{ fontWeight: 400, color: '#9ca3af', marginLeft: 6 }}>— {hint}</span>}
+      <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 4 }}>
+        {label}{hint && <span style={{ fontWeight: 400, color: 'var(--text-faint)', marginLeft: 6 }}>— {hint}</span>}
       </label>
       {children}
       {error && <p style={{ margin: '4px 0 0', fontSize: 12, color: '#dc2626' }}>{error}</p>}

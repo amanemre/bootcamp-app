@@ -115,6 +115,20 @@ db.exec(`
   )
 `);
 
+db.exec(`
+  CREATE TABLE IF NOT EXISTS user_preferences (
+    id                             INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id                        TEXT NOT NULL DEFAULT 'default' UNIQUE,
+    theme                          TEXT NOT NULL DEFAULT 'system' CHECK(theme IN ('light','dark','system')),
+    default_severity_for_new_bugs  TEXT NOT NULL DEFAULT 'Minor' CHECK(default_severity_for_new_bugs IN ('Critical','Major','Minor','Trivial')),
+    default_page_size              INTEGER NOT NULL DEFAULT 20 CHECK(default_page_size IN (10,20,50,100)),
+    timezone                       TEXT NOT NULL DEFAULT '',
+    auto_generate_report_after_run INTEGER NOT NULL DEFAULT 1 CHECK(auto_generate_report_after_run IN (0,1)),
+    created_at                     TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at                     TEXT NOT NULL DEFAULT (datetime('now'))
+  )
+`);
+
 // Migration: expand bug_activity.action to include 'field_change'
 const activitySchema = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='bug_activity'").get();
 if (activitySchema && !activitySchema.sql.includes('field_change')) {

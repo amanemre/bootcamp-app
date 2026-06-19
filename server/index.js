@@ -5,6 +5,8 @@ const bugsRouter      = require('./routes/bugs');
 const runsRouter      = require('./routes/runs');
 const dashboardRouter = require('./routes/dashboard');
 const reportsRouter   = require('./routes/reports');
+const settingsRouter  = require('./routes/settings');
+const searchRouter    = require('./routes/search');
 const seed = require('./seed');
 
 const app = express();
@@ -27,6 +29,8 @@ app.use('/api/bugs',       bugsRouter);
 app.use('/api/runs',       runsRouter);
 app.use('/api/dashboard',  dashboardRouter);
 app.use('/api/reports',    reportsRouter);
+app.use('/api/settings',   settingsRouter);
+app.use('/api/search',     searchRouter);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

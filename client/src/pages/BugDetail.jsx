@@ -7,21 +7,21 @@ const SEV_STYLES = {
   Critical: { background: '#fee2e2', color: '#dc2626' },
   Major:    { background: '#ffedd5', color: '#ea580c' },
   Minor:    { background: '#fef9c3', color: '#854d0e' },
-  Trivial:  { background: '#f3f4f6', color: '#6b7280' },
+  Trivial:  { background: '#f3f4f6', color: '#4b5563' },
 };
 
 const PRI_STYLES = {
   Critical: { background: '#fee2e2', color: '#dc2626' },
   High:     { background: '#ffedd5', color: '#ea580c' },
   Medium:   { background: '#dbeafe', color: '#1d4ed8' },
-  Low:      { background: '#f3f4f6', color: '#6b7280' },
+  Low:      { background: '#f3f4f6', color: '#4b5563' },
 };
 
 const STATUS_STYLES = {
   'Open':        { background: '#dbeafe', color: '#1d4ed8' },
   'In Progress': { background: '#fef9c3', color: '#854d0e' },
   'Resolved':    { background: '#dcfce7', color: '#16a34a' },
-  'Closed':      { background: '#f3f4f6', color: '#6b7280' },
+  'Closed':      { background: '#f3f4f6', color: '#4b5563' },
   'Reopened':    { background: '#f3e8ff', color: '#7e22ce' },
 };
 
@@ -34,24 +34,18 @@ const TRANSITIONS = {
 };
 
 function Badge({ value, map }) {
-  const s = map[value] ?? { background: '#f3f4f6', color: '#374151' };
+  const s = map[value] ?? { background: '#f3f4f6', color: '#4b5563' };
   return <span style={{ padding: '3px 11px', borderRadius: 12, fontSize: 13, fontWeight: 600, background: s.background, color: s.color, whiteSpace: 'nowrap' }}>{value}</span>;
 }
 
-function formatDateTime(str) {
-  if (!str) return '—';
-  const d = new Date(str.replace(' ', 'T') + 'Z');
-  const date = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-  const time = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-  return `${date} ${time}`;
-}
+import { formatDateTime } from '../utils/datetime';
 
 function Section({ title, children }) {
   if (!children) return null;
   return (
     <div style={{ marginBottom: 24 }}>
-      <h3 style={{ margin: '0 0 8px', fontSize: 13, fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{title}</h3>
-      <div style={{ fontSize: 14, color: '#111827', lineHeight: 1.6 }}>{children}</div>
+      <h3 style={{ margin: '0 0 8px', fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{title}</h3>
+      <div style={{ fontSize: 14, color: 'var(--text)', lineHeight: 1.6 }}>{children}</div>
     </div>
   );
 }
@@ -142,8 +136,8 @@ export default function BugDetail() {
     }
   }
 
-  if (loading)    return <div style={{ padding: '48px 32px', textAlign: 'center', color: '#9ca3af' }}>Loading…</div>;
-  if (notFound)   return <div style={{ padding: '48px 32px', textAlign: 'center', color: '#9ca3af' }}>Bug not found.</div>;
+  if (loading)    return <div style={{ padding: '48px 32px', textAlign: 'center', color: 'var(--text-faint)' }}>Loading…</div>;
+  if (notFound)   return <div style={{ padding: '48px 32px', textAlign: 'center', color: 'var(--text-faint)' }}>Bug not found.</div>;
   if (fetchError) return (
     <div style={{ padding: '32px', maxWidth: 860, margin: '0 auto' }}>
       <div style={{ background: '#fee2e2', color: '#dc2626', padding: '14px 18px', borderRadius: 6, fontSize: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -158,7 +152,7 @@ export default function BugDetail() {
   return (
     <div style={{ padding: '24px 32px', maxWidth: 860, margin: '0 auto' }}>
       {/* Back */}
-      <button onClick={() => navigate('/bugs')} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280', fontSize: 14, padding: 0, marginBottom: 20 }}>
+      <button onClick={() => navigate('/bugs')} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--canvas-muted)', fontSize: 14, padding: 0, marginBottom: 20 }}>
         <ArrowLeft size={15} /> Back to Bugs
       </button>
 
@@ -166,10 +160,10 @@ export default function BugDetail() {
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, marginBottom: 20 }}>
         <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, lineHeight: 1.3, flex: 1 }}>{bug.title}</h1>
         <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
-          <button onClick={() => setEditOpen(true)} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '7px 13px', borderRadius: 6, border: '1px solid #d1d5db', background: '#fff', cursor: 'pointer', fontSize: 14 }}>
+          <button onClick={() => setEditOpen(true)} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '7px 13px', borderRadius: 6, border: '1px solid var(--border)', background: 'var(--surface)', cursor: 'pointer', fontSize: 14 }}>
             <Pencil size={13} /> Edit
           </button>
-          <button onClick={handleDelete} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '7px 13px', borderRadius: 6, border: '1px solid #fca5a5', background: '#fff', color: '#dc2626', cursor: 'pointer', fontSize: 14 }}>
+          <button onClick={handleDelete} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '7px 13px', borderRadius: 6, border: '1px solid #fca5a5', background: 'var(--surface)', color: '#dc2626', cursor: 'pointer', fontSize: 14 }}>
             <Trash2 size={13} /> Delete
           </button>
         </div>
@@ -180,8 +174,8 @@ export default function BugDetail() {
         <Badge value={bug.status}   map={STATUS_STYLES} />
         <Badge value={bug.severity} map={SEV_STYLES} />
         <Badge value={bug.priority} map={PRI_STYLES} />
-        <span style={{ fontSize: 13, color: '#9ca3af', marginLeft: 4 }}>Created {formatDateTime(bug.created_at)}</span>
-        {bug.updated_at !== bug.created_at && <span style={{ fontSize: 13, color: '#9ca3af' }}>· Updated {formatDateTime(bug.updated_at)}</span>}
+        <span style={{ fontSize: 13, color: 'var(--text-faint)', marginLeft: 4 }}>Created {formatDateTime(bug.created_at)}</span>
+        {bug.updated_at !== bug.created_at && <span style={{ fontSize: 13, color: 'var(--text-faint)' }}>· Updated {formatDateTime(bug.updated_at)}</span>}
       </div>
 
       {actionError && (
@@ -192,7 +186,7 @@ export default function BugDetail() {
       )}
 
       {/* Details */}
-      <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: 24, marginBottom: 24 }}>
+      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, padding: 24, marginBottom: 24 }}>
         {bug.description && <Section title="Description">{bug.description}</Section>}
 
         {bug.steps?.length > 0 && (
@@ -207,14 +201,14 @@ export default function BugDetail() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginBottom: 24 }}>
             {bug.expected && (
               <div>
-                <h3 style={{ margin: '0 0 6px', fontSize: 13, fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Expected Result</h3>
-                <div style={{ fontSize: 14, color: '#111827', lineHeight: 1.6 }}>{bug.expected}</div>
+                <h3 style={{ margin: '0 0 6px', fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Expected Result</h3>
+                <div style={{ fontSize: 14, color: 'var(--text)', lineHeight: 1.6 }}>{bug.expected}</div>
               </div>
             )}
             {bug.actual && (
               <div>
-                <h3 style={{ margin: '0 0 6px', fontSize: 13, fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Actual Result</h3>
-                <div style={{ fontSize: 14, color: '#111827', lineHeight: 1.6 }}>{bug.actual}</div>
+                <h3 style={{ margin: '0 0 6px', fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Actual Result</h3>
+                <div style={{ fontSize: 14, color: 'var(--text)', lineHeight: 1.6 }}>{bug.actual}</div>
               </div>
             )}
           </div>
@@ -224,13 +218,13 @@ export default function BugDetail() {
       </div>
 
       {/* Status change */}
-      <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: 20, marginBottom: 24 }}>
+      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, padding: 20, marginBottom: 24 }}>
         <h3 style={{ margin: '0 0 14px', fontSize: 14, fontWeight: 600 }}>Change Status</h3>
         {allowed.length === 0 ? (
-          <p style={{ margin: 0, fontSize: 14, color: '#9ca3af' }}>No further transitions available from <strong>{bug.status}</strong>.</p>
+          <p style={{ margin: 0, fontSize: 14, color: 'var(--text-faint)' }}>No further transitions available from <strong>{bug.status}</strong>.</p>
         ) : (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <select value={nextStatus} onChange={e => setNextStatus(e.target.value)} style={{ padding: '8px 12px', borderRadius: 6, border: '1px solid #d1d5db', fontSize: 14, background: '#fff' }}>
+            <select value={nextStatus} onChange={e => setNextStatus(e.target.value)} style={{ padding: '8px 12px', borderRadius: 6, border: '1px solid var(--border)', fontSize: 14, background: 'var(--surface)' }}>
               <option value="">Select next status…</option>
               {allowed.map(s => <option key={s}>{s}</option>)}
             </select>
@@ -243,37 +237,37 @@ export default function BugDetail() {
       </div>
 
       {/* Activity timeline */}
-      <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: 20 }}>
+      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, padding: 20 }}>
         <h3 style={{ margin: '0 0 16px', fontSize: 14, fontWeight: 600 }}>Activity</h3>
 
         {bug.activity?.length === 0 && (
-          <p style={{ fontSize: 14, color: '#9ca3af', margin: '0 0 16px' }}>No activity yet.</p>
+          <p style={{ fontSize: 14, color: 'var(--text-faint)', margin: '0 0 16px' }}>No activity yet.</p>
         )}
 
         <div style={{ marginBottom: 16 }}>
           {(bug.activity ?? []).map(a => (
-            <div key={a.id} style={{ display: 'flex', gap: 12, marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid #f3f4f6' }}>
+            <div key={a.id} style={{ display: 'flex', gap: 12, marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid var(--border-subtle)' }}>
               <div style={{ width: 28, height: 28, borderRadius: '50%', background: a.action === 'comment' ? '#f3e8ff' : a.action === 'field_change' ? '#fef9c3' : '#dbeafe', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
                 {a.action === 'comment'
-                  ? <MessageSquare size={13} color="#7e22ce" />
+                  ? <MessageSquare size={13} color="var(--status-skip)" />
                   : a.action === 'field_change'
                   ? <Pencil size={13} color="#854d0e" />
                   : <RefreshCw size={13} color="#1d4ed8" />}
               </div>
               <div style={{ flex: 1 }}>
                 {a.action === 'status_change' ? (
-                  <p style={{ margin: '0 0 2px', fontSize: 14, color: '#374151' }}>
+                  <p style={{ margin: '0 0 2px', fontSize: 14, color: 'var(--text-secondary)' }}>
                     Status changed from <strong>{a.old_value}</strong> to <strong>{a.new_value}</strong>
                   </p>
                 ) : a.action === 'field_change' ? (
-                  <p style={{ margin: '0 0 2px', fontSize: 14, color: '#374151' }}>
+                  <p style={{ margin: '0 0 2px', fontSize: 14, color: 'var(--text-secondary)' }}>
                     <strong>{a.message}</strong> updated
-                    {a.old_value && <span style={{ color: '#9ca3af' }}> from "{a.old_value.length > 60 ? a.old_value.slice(0, 60) + '…' : a.old_value}"</span>}
+                    {a.old_value && <span style={{ color: 'var(--text-faint)' }}> from "{a.old_value.length > 60 ? a.old_value.slice(0, 60) + '…' : a.old_value}"</span>}
                   </p>
                 ) : (
-                  <p style={{ margin: '0 0 2px', fontSize: 14, color: '#374151' }}>{a.message}</p>
+                  <p style={{ margin: '0 0 2px', fontSize: 14, color: 'var(--text-secondary)' }}>{a.message}</p>
                 )}
-                <p style={{ margin: 0, fontSize: 12, color: '#9ca3af' }}>{formatDateTime(a.created_at)}</p>
+                <p style={{ margin: 0, fontSize: 12, color: 'var(--text-faint)' }}>{formatDateTime(a.created_at)}</p>
               </div>
             </div>
           ))}
@@ -281,13 +275,13 @@ export default function BugDetail() {
 
         {/* Add comment */}
         <form onSubmit={submitComment}>
-          <h4 style={{ margin: '0 0 8px', fontSize: 13, fontWeight: 600, color: '#374151' }}>Add Comment</h4>
+          <h4 style={{ margin: '0 0 8px', fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)' }}>Add Comment</h4>
           <textarea
             value={comment}
             onChange={e => setComment(e.target.value)}
             placeholder="Write a comment…"
             maxLength={2000}
-            style={{ width: '100%', padding: '8px 10px', borderRadius: 6, border: '1px solid #d1d5db', fontSize: 14, height: 72, resize: 'vertical', boxSizing: 'border-box', fontFamily: 'inherit', marginBottom: 8 }}
+            style={{ width: '100%', padding: '8px 10px', borderRadius: 6, border: '1px solid var(--border)', fontSize: 14, height: 72, resize: 'vertical', boxSizing: 'border-box', fontFamily: 'inherit', marginBottom: 8 }}
           />
           <button type="submit" disabled={!comment.trim() || commenting}
             style={{ padding: '7px 16px', borderRadius: 6, border: 'none', background: comment.trim() ? '#2563eb' : '#bfdbfe', color: '#fff', fontWeight: 600, fontSize: 14, cursor: comment.trim() ? 'pointer' : 'default', opacity: commenting ? 0.7 : 1 }}>

@@ -6,34 +6,29 @@ const SEV_STYLES = {
   Critical: { background: '#fee2e2', color: '#dc2626' },
   Major:    { background: '#ffedd5', color: '#ea580c' },
   Minor:    { background: '#fef9c3', color: '#854d0e' },
-  Trivial:  { background: '#f3f4f6', color: '#6b7280' },
+  Trivial:  { background: '#f3f4f6', color: '#4b5563' },
 };
 
 const RESULT_STYLES = {
-  pending: { background: '#f3f4f6', color: '#6b7280' },
+  pending: { background: '#f3f4f6', color: '#4b5563' },
   passed:  { background: '#dcfce7', color: '#16a34a' },
   failed:  { background: '#fee2e2', color: '#dc2626' },
   skipped: { background: '#f3e8ff', color: '#7e22ce' },
 };
 
 function Badge({ value, map }) {
-  if (!value) return <span style={{ color: '#d1d5db' }}>—</span>;
-  const s = map[value] ?? { background: '#f3f4f6', color: '#374151' };
+  if (!value) return <span style={{ color: 'var(--text-faint)' }}>—</span>;
+  const s = map[value] ?? { background: '#f3f4f6', color: '#4b5563' };
   return <span style={{ padding: '2px 10px', borderRadius: 12, fontSize: 12, fontWeight: 600, background: s.background, color: s.color, whiteSpace: 'nowrap' }}>{value}</span>;
 }
 
-function formatDateTime(str) {
-  if (!str) return '—';
-  const d = new Date(str.replace(' ', 'T') + 'Z');
-  if (Number.isNaN(d.getTime())) return '—';
-  return d.toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
-}
+import { formatDateTimeShort as formatDateTime } from '../utils/datetime';
 
 function SummaryCard({ label, value, accent }) {
   return (
-    <div style={{ flex: 1, minWidth: 110, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 10, padding: '14px 18px' }}>
-      <div style={{ fontSize: 12, color: '#6b7280' }}>{label}</div>
-      <div style={{ fontSize: 26, fontWeight: 700, color: accent ?? '#111827', marginTop: 4 }}>{value}</div>
+    <div style={{ flex: 1, minWidth: 110, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, padding: '14px 18px' }}>
+      <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{label}</div>
+      <div style={{ fontSize: 26, fontWeight: 700, color: accent ?? 'var(--text)', marginTop: 4 }}>{value}</div>
     </div>
   );
 }
@@ -99,8 +94,8 @@ export default function ReportDetail() {
     }
   }
 
-  if (loading)    return <div style={{ padding: '48px 32px', textAlign: 'center', color: '#9ca3af' }}>Loading…</div>;
-  if (notFound)   return <div style={{ padding: '48px 32px', textAlign: 'center', color: '#9ca3af' }}>Report not found.</div>;
+  if (loading)    return <div style={{ padding: '48px 32px', textAlign: 'center', color: 'var(--text-faint)' }}>Loading…</div>;
+  if (notFound)   return <div style={{ padding: '48px 32px', textAlign: 'center', color: 'var(--text-faint)' }}>Report not found.</div>;
   if (fetchError) return (
     <div style={{ padding: '32px', maxWidth: 900, margin: '0 auto' }}>
       <div style={{ background: '#fee2e2', color: '#dc2626', padding: '14px 18px', borderRadius: 6, fontSize: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -114,7 +109,7 @@ export default function ReportDetail() {
 
   return (
     <div style={{ padding: '24px 32px', maxWidth: 900, margin: '0 auto' }}>
-      <button onClick={() => navigate('/reports')} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280', fontSize: 14, padding: 0, marginBottom: 20 }}>
+      <button onClick={() => navigate('/reports')} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--canvas-muted)', fontSize: 14, padding: 0, marginBottom: 20 }}>
         <ArrowLeft size={15} /> Back to Reports
       </button>
 
@@ -125,7 +120,7 @@ export default function ReportDetail() {
         </h1>
         <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
           <button onClick={handleDownload}
-            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 6, border: '1px solid #d1d5db', background: '#fff', color: '#374151', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
+            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 6, border: '1px solid var(--border)', background: 'var(--surface)', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
             <Download size={15} /> Download HTML
           </button>
           <button onClick={handlePrint} disabled={printing}
@@ -135,10 +130,10 @@ export default function ReportDetail() {
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: 16, fontSize: 13, color: '#6b7280', flexWrap: 'wrap', marginBottom: 20 }}>
-        <span>Run date: <strong style={{ color: '#374151' }}>{formatDateTime(report.run_date)}</strong></span>
-        <span>Generated: <strong style={{ color: '#374151' }}>{formatDateTime(report.generated_at)}</strong></span>
-        {report.run_id != null && <span>From run: <strong style={{ color: '#374151' }}>#{report.run_id}</strong></span>}
+      <div style={{ display: 'flex', gap: 16, fontSize: 13, color: 'var(--canvas-muted)', flexWrap: 'wrap', marginBottom: 20 }}>
+        <span>Run date: <strong style={{ color: 'var(--canvas-strong)' }}>{formatDateTime(report.run_date)}</strong></span>
+        <span>Generated: <strong style={{ color: 'var(--canvas-strong)' }}>{formatDateTime(report.generated_at)}</strong></span>
+        {report.run_id != null && <span>From run: <strong style={{ color: 'var(--canvas-strong)' }}>#{report.run_id}</strong></span>}
       </div>
 
       {actionError && (
@@ -151,17 +146,17 @@ export default function ReportDetail() {
       {/* Summary cards */}
       <div style={{ display: 'flex', gap: 12, marginBottom: 28, flexWrap: 'wrap' }}>
         <SummaryCard label="Total"    value={report.total_count} />
-        <SummaryCard label="Passed"   value={report.passed_count}  accent="#16a34a" />
-        <SummaryCard label="Failed"   value={report.failed_count}  accent="#dc2626" />
-        <SummaryCard label="Skipped"  value={report.skipped_count} accent="#7e22ce" />
+        <SummaryCard label="Passed"   value={report.passed_count}  accent="var(--status-pass)" />
+        <SummaryCard label="Failed"   value={report.failed_count}  accent="var(--status-fail)" />
+        <SummaryCard label="Skipped"  value={report.skipped_count} accent="var(--status-skip)" />
         <SummaryCard label="Pass Rate" value={report.total_count > 0 ? `${Math.round((report.passed_count / report.total_count) * 100)}%` : '—'} />
       </div>
 
       {/* Per-case results */}
-      <div style={{ border: '1px solid #e5e7eb', borderRadius: 8, overflow: 'hidden', background: '#fff' }}>
+      <div style={{ border: '1px solid var(--border)', borderRadius: 8, overflow: 'hidden', background: 'var(--surface)' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
           <thead>
-            <tr style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
+            <tr style={{ background: 'var(--surface-alt)', borderBottom: '1px solid var(--border)' }}>
               <th style={{ ...th, width: 40 }}>#</th>
               <th style={th}>Test Case</th>
               <th style={{ ...th, width: 100 }}>Severity</th>
@@ -172,20 +167,20 @@ export default function ReportDetail() {
           </thead>
           <tbody>
             {results.length === 0 && (
-              <tr><td colSpan={6} style={{ padding: 32, textAlign: 'center', color: '#9ca3af' }}>This report has no test cases.</td></tr>
+              <tr><td colSpan={6} style={{ padding: 32, textAlign: 'center', color: 'var(--text-faint)' }}>This report has no test cases.</td></tr>
             )}
             {results.map((r, i) => (
-              <tr key={i} style={{ background: i % 2 ? '#fafafa' : '#fff', borderBottom: '1px solid #f3f4f6' }}>
-                <td style={{ ...td, color: '#9ca3af' }}>{i + 1}</td>
+              <tr key={i} style={{ background: i % 2 ? 'var(--surface-alt)' : 'var(--surface)', borderBottom: '1px solid var(--border-subtle)' }}>
+                <td style={{ ...td, color: 'var(--text-faint)' }}>{i + 1}</td>
                 <td style={{ ...td, fontWeight: 500 }}>{r.case_title}</td>
                 <td style={td}><Badge value={r.severity} map={SEV_STYLES} /></td>
                 <td style={td}><Badge value={r.result} map={RESULT_STYLES} /></td>
-                <td style={{ ...td, color: '#6b7280' }}>{r.duration_ms != null ? `${r.duration_ms} ms` : '—'}</td>
-                <td style={{ ...td, color: '#6b7280', fontSize: 13 }}>
+                <td style={{ ...td, color: 'var(--text-muted)' }}>{r.duration_ms != null ? `${r.duration_ms} ms` : '—'}</td>
+                <td style={{ ...td, color: 'var(--text-muted)', fontSize: 13 }}>
                   {r.notes || '—'}
                   {r.github_issue_url && (
                     <a href={r.github_issue_url} target="_blank" rel="noreferrer"
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: 4, marginLeft: 8, fontSize: 12, color: '#2563eb', textDecoration: 'none' }}>
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: 4, marginLeft: 8, fontSize: 12, color: 'var(--link)', textDecoration: 'none' }}>
                       <ExternalLink size={12} /> Issue
                     </a>
                   )}
@@ -199,5 +194,5 @@ export default function ReportDetail() {
   );
 }
 
-const th = { padding: '10px 16px', textAlign: 'left', fontWeight: 600, fontSize: 13, color: '#374151' };
+const th = { padding: '10px 16px', textAlign: 'left', fontWeight: 600, fontSize: 13, color: 'var(--text-secondary)' };
 const td = { padding: '12px 16px', verticalAlign: 'top' };

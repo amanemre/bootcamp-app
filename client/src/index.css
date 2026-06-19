@@ -1,3 +1,45 @@
 *, *::before, *::after { box-sizing: border-box; }
-body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f9fafb; color: #111827; }
+body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--canvas); color: var(--text); transition: background 0.2s ease, color 0.2s ease; }
 button, input, select, textarea { font-family: inherit; }
+
+/* ── Theme tokens ──────────────────────────────────────────────────────────
+   Components reference these via inline style (e.g. background: 'var(--surface)').
+   Dark mode redefines them so cards, tables, borders and text all flip together. */
+:root {
+  --canvas: #f9fafb;          /* page background */
+  --surface: #fff;            /* cards, tables, rows, modals */
+  --surface-alt: #f9fafb;     /* table headers, alternating rows, subtle fills */
+  --surface-hover: #f0f9ff;   /* row hover */
+  --border: #e5e7eb;          /* card / table borders, inputs */
+  --border-subtle: #f3f4f6;   /* row dividers */
+  --text: #111827;            /* primary text */
+  --text-secondary: #374151;  /* labels, secondary text */
+  --text-muted: #6b7280;      /* muted / metadata */
+  --text-faint: #9ca3af;      /* faint / placeholders / em-dashes */
+
+  /* Canvas-level text (page headings, detail metadata, list footers). */
+  --canvas-heading: #0f172a; --canvas-strong: #374151; --canvas-muted: #6b7280;
+  /* Status text colors (run progress legend, count cells). */
+  --status-pass: #16a34a; --status-fail: #dc2626; --status-skip: #7e22ce;
+  --link: #2563eb;            /* link / id text */
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;         /* native inputs/scrollbars render dark, matching cards */
+  --canvas: #0f172a;
+  --surface: #1e293b;
+  --surface-alt: #243044;
+  --surface-hover: #334155;
+  --border: #334155;
+  --border-subtle: #2a3650;
+  --text: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --text-faint: #8b98ab;
+
+  --canvas-heading: #f1f5f9; --canvas-strong: #e2e8f0; --canvas-muted: #94a3b8;
+  --status-pass: #22c55e; --status-fail: #f87171; --status-skip: #c084fc;
+  --link: #60a5fa;
+}
+
+[data-theme="dark"] h1 { color: var(--canvas-heading); }

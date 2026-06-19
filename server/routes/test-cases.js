@@ -68,8 +68,9 @@ function validateTestCaseInput({ title, steps, expected_result, severity, status
 
 function handleListTestCases(req, res) {
   try {
-    const { page = 1, status, search, sort = 'updated_at', order = 'desc' } = req.query;
-    const limit = 20;
+    const { page = 1, pageSize, status, search, sort = 'updated_at', order = 'desc' } = req.query;
+    const ALLOWED_PAGE_SIZES = [10, 20, 50, 100];
+    const limit = ALLOWED_PAGE_SIZES.includes(Number(pageSize)) ? Number(pageSize) : 20;
     const offset = (Math.max(1, Number(page)) - 1) * limit;
 
     const { where, params, orderBy } = buildFilter({ status, search, sort, order });

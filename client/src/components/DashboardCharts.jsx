@@ -14,7 +14,7 @@ const C = {
   gray:   '#94a3b8',
   grid:   '#eef2f6',
   axis:   '#94a3b8',
-  text:   '#0f172a',
+  text:   'var(--text)',
 };
 
 const STATUS_COLOR = {
@@ -29,7 +29,7 @@ const STATUS_COLOR = {
 function ChartCard({ title, subtitle, children, style }) {
   return (
     <div style={{
-      background: '#fff', border: '1px solid #e8edf3', borderRadius: 14,
+      background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 14,
       padding: '20px 22px', boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 4px 16px rgba(15,23,42,0.04)',
       display: 'flex', flexDirection: 'column', ...style,
     }}>
@@ -47,7 +47,7 @@ function ChartEmpty({ children }) {
     <div style={{
       height: 240, display: 'flex', alignItems: 'center', justifyContent: 'center',
       textAlign: 'center', color: '#94a3b8', fontSize: 13.5,
-      border: '1px dashed #e2e8f0', borderRadius: 10, padding: '0 24px', lineHeight: 1.5,
+      border: '1px dashed var(--border)', borderRadius: 10, padding: '0 24px', lineHeight: 1.5,
     }}>
       {children}
     </div>
@@ -55,15 +55,15 @@ function ChartEmpty({ children }) {
 }
 
 const tooltipStyle = {
-  border: '1px solid #e8edf3', borderRadius: 10, boxShadow: '0 4px 16px rgba(15,23,42,0.10)',
+  border: '1px solid var(--border)', borderRadius: 10, boxShadow: '0 4px 16px rgba(15,23,42,0.10)',
   fontSize: 12.5, padding: '8px 12px',
 };
 function TipShell({ label, rows }) {
   return (
-    <div style={{ background: '#fff', ...tooltipStyle }}>
+    <div style={{ background: 'var(--surface)', ...tooltipStyle }}>
       {label && <div style={{ fontWeight: 700, color: C.text, marginBottom: 4 }}>{label}</div>}
       {rows.map((r, i) => (
-        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 7, color: '#475569' }}>
+        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 7, color: 'var(--text-secondary)' }}>
           {r.color && <span style={{ width: 9, height: 9, borderRadius: 3, background: r.color }} />}
           <span>{r.label}</span>
           <span style={{ marginLeft: 'auto', fontWeight: 700, color: C.text }}>{r.value}</span>
@@ -141,7 +141,7 @@ export function BugsWeeklyChart({ data = [] }) {
             <Legend
               iconType="circle" iconSize={9}
               wrapperStyle={{ fontSize: 12.5, paddingTop: 8 }}
-              formatter={v => <span style={{ color: '#475569' }}>{v}</span>}
+              formatter={v => <span style={{ color: 'var(--text-secondary)' }}>{v}</span>}
             />
             <Bar name="Opened" dataKey="opened" fill={C.blue}  radius={[4, 4, 0, 0]} maxBarSize={26} />
             <Bar name="Closed" dataKey="closed" fill={C.green} radius={[4, 4, 0, 0]} maxBarSize={26} />
@@ -205,7 +205,7 @@ export function CoverageDonutChart({ data = [] }) {
             {data.map(d => (
               <div key={d.status} style={{ display: 'flex', alignItems: 'center', gap: 9, fontSize: 13, padding: '5px 0' }}>
                 <span style={{ width: 10, height: 10, borderRadius: 3, background: STATUS_COLOR[d.status], opacity: d.count ? 1 : 0.3, flexShrink: 0 }} />
-                <span style={{ color: d.count ? '#334155' : '#94a3b8' }}>{d.status}</span>
+                <span style={{ color: d.count ? 'var(--text-secondary)' : '#94a3b8' }}>{d.status}</span>
                 <span style={{ marginLeft: 'auto', fontWeight: 700, color: d.count ? C.text : '#cbd5e1' }}>
                   {d.count}{d.count ? ` · ${Math.round((d.count / total) * 100)}%` : ''}
                 </span>
@@ -222,7 +222,7 @@ export function CoverageDonutChart({ data = [] }) {
 export function ChartSkeleton({ wide }) {
   return (
     <div style={{
-      background: '#fff', border: '1px solid #e8edf3', borderRadius: 14, padding: '20px 22px',
+      background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 14, padding: '20px 22px',
       flex: wide ? 1.3 : 1, minWidth: wide ? 360 : 300, minHeight: 320,
       boxShadow: '0 1px 2px rgba(15,23,42,0.04)',
     }}>

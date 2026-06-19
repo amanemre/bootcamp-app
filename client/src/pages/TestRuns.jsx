@@ -7,20 +7,16 @@ const STATUS_STYLES = {
 };
 
 function StatusBadge({ status }) {
-  const s = STATUS_STYLES[status] ?? { background: '#f3f4f6', color: '#374151', label: status };
+  const s = STATUS_STYLES[status] ?? { background: '#f3f4f6', color: '#4b5563', label: status };
   return <span style={{ padding: '2px 10px', borderRadius: 12, fontSize: 12, fontWeight: 600, background: s.background, color: s.color, whiteSpace: 'nowrap' }}>{s.label}</span>;
 }
 
 function CountPill({ count, color }) {
-  if (!count) return <span style={{ fontSize: 13, color: '#d1d5db' }}>—</span>;
+  if (!count) return <span style={{ fontSize: 13, color: 'var(--text-faint)' }}>—</span>;
   return <span style={{ fontSize: 13, fontWeight: 600, color }}>{count}</span>;
 }
 
-function formatDate(str) {
-  if (!str) return '—';
-  const d = new Date(str.replace(' ', 'T') + 'Z');
-  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-}
+import { formatDate } from '../utils/datetime';
 
 export default function TestRuns() {
   const navigate = useNavigate();
@@ -58,51 +54,51 @@ export default function TestRuns() {
         </div>
       )}
 
-      <div style={{ border: '1px solid #e5e7eb', borderRadius: 8, overflow: 'hidden', background: '#fff' }}>
+      <div style={{ border: '1px solid var(--border)', borderRadius: 8, overflow: 'hidden', background: 'var(--surface)' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
           <thead>
-            <tr style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
+            <tr style={{ background: 'var(--surface-alt)', borderBottom: '1px solid var(--border)' }}>
               <th style={th}>Suite</th>
               <th style={th}>Feature</th>
               <th style={{ ...th, width: 120 }}>Status</th>
-              <th style={{ ...th, width: 60, textAlign: 'center', color: '#16a34a' }}>Pass</th>
-              <th style={{ ...th, width: 60, textAlign: 'center', color: '#dc2626' }}>Fail</th>
-              <th style={{ ...th, width: 60, textAlign: 'center', color: '#7e22ce' }}>Skip</th>
+              <th style={{ ...th, width: 60, textAlign: 'center', color: 'var(--status-pass)' }}>Pass</th>
+              <th style={{ ...th, width: 60, textAlign: 'center', color: 'var(--status-fail)' }}>Fail</th>
+              <th style={{ ...th, width: 60, textAlign: 'center', color: 'var(--status-skip)' }}>Skip</th>
               <th style={{ ...th, width: 120 }}>Started</th>
             </tr>
           </thead>
           <tbody>
-            {loading && <tr><td colSpan={7} style={{ padding: 40, textAlign: 'center', color: '#9ca3af' }}>Loading…</td></tr>}
+            {loading && <tr><td colSpan={7} style={{ padding: 40, textAlign: 'center', color: 'var(--text-faint)' }}>Loading…</td></tr>}
             {!loading && runs.length === 0 && (
-              <tr><td colSpan={7} style={{ padding: 40, textAlign: 'center', color: '#9ca3af' }}>
+              <tr><td colSpan={7} style={{ padding: 40, textAlign: 'center', color: 'var(--text-faint)' }}>
                 No test runs yet. Start one from a suite's detail page.
               </td></tr>
             )}
             {!loading && runs.map((run, i) => (
               <tr key={run.id} onClick={() => navigate(`/test-runs/${run.id}`)}
-                style={{ background: i % 2 ? '#fafafa' : '#fff', borderBottom: '1px solid #f3f4f6', cursor: 'pointer' }}
-                onMouseEnter={e => e.currentTarget.style.background = '#f0f9ff'}
-                onMouseLeave={e => e.currentTarget.style.background = i % 2 ? '#fafafa' : '#fff'}
+                style={{ background: i % 2 ? 'var(--surface-alt)' : 'var(--surface)', borderBottom: '1px solid var(--border-subtle)', cursor: 'pointer' }}
+                onMouseEnter={e => e.currentTarget.style.background = 'var(--surface-hover)'}
+                onMouseLeave={e => e.currentTarget.style.background = i % 2 ? 'var(--surface-alt)' : 'var(--surface)'}
               >
                 <td style={{ ...td, fontWeight: 500 }}>{run.suite_name ?? '—'}</td>
-                <td style={{ ...td, color: '#6b7280' }}>{run.feature ?? '—'}</td>
+                <td style={{ ...td, color: 'var(--text-muted)' }}>{run.feature ?? '—'}</td>
                 <td style={td}><StatusBadge status={run.status} /></td>
-                <td style={{ ...td, textAlign: 'center' }}><CountPill count={run.pass_count} color="#16a34a" /></td>
-                <td style={{ ...td, textAlign: 'center' }}><CountPill count={run.fail_count} color="#dc2626" /></td>
-                <td style={{ ...td, textAlign: 'center' }}><CountPill count={run.skip_count} color="#7e22ce" /></td>
-                <td style={{ ...td, color: '#9ca3af', fontSize: 13 }}>{formatDate(run.start_time)}</td>
+                <td style={{ ...td, textAlign: 'center' }}><CountPill count={run.pass_count} color="var(--status-pass)" /></td>
+                <td style={{ ...td, textAlign: 'center' }}><CountPill count={run.fail_count} color="var(--status-fail)" /></td>
+                <td style={{ ...td, textAlign: 'center' }}><CountPill count={run.skip_count} color="var(--status-skip)" /></td>
+                <td style={{ ...td, color: 'var(--text-faint)', fontSize: 13 }}>{formatDate(run.start_time)}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      <div style={{ marginTop: 12, fontSize: 13, color: '#6b7280' }}>
+      <div style={{ marginTop: 12, fontSize: 13, color: 'var(--canvas-muted)' }}>
         {runs.length} run{runs.length !== 1 ? 's' : ''}
       </div>
     </div>
   );
 }
 
-const th = { padding: '10px 16px', textAlign: 'left', fontWeight: 600, fontSize: 13, color: '#374151' };
+const th = { padding: '10px 16px', textAlign: 'left', fontWeight: 600, fontSize: 13, color: 'var(--text-secondary)' };
 const td = { padding: '12px 16px', verticalAlign: 'middle' };

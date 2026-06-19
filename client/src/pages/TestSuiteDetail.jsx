@@ -16,11 +16,11 @@ const SEVERITY_STYLES = {
   Critical: { background: '#fee2e2', color: '#dc2626' },
   Major:    { background: '#ffedd5', color: '#ea580c' },
   Minor:    { background: '#fef9c3', color: '#854d0e' },
-  Trivial:  { background: '#f3f4f6', color: '#6b7280' },
+  Trivial:  { background: '#f3f4f6', color: '#4b5563' },
 };
 
 const TC_STATUS_STYLES = {
-  Draft:   { background: '#f3f4f6', color: '#6b7280' },
+  Draft:   { background: '#f3f4f6', color: '#4b5563' },
   Ready:   { background: '#dbeafe', color: '#1d4ed8' },
   Passed:  { background: '#dcfce7', color: '#16a34a' },
   Failed:  { background: '#fee2e2', color: '#dc2626' },
@@ -28,7 +28,7 @@ const TC_STATUS_STYLES = {
 };
 
 const SUITE_STATUS_STYLES = {
-  Draft:          { background: '#f3f4f6', color: '#6b7280' },
+  Draft:          { background: '#f3f4f6', color: '#4b5563' },
   Ready:          { background: '#dbeafe', color: '#1d4ed8' },
   'In Progress':  { background: '#fef9c3', color: '#854d0e' },
   Passed:         { background: '#dcfce7', color: '#16a34a' },
@@ -36,7 +36,7 @@ const SUITE_STATUS_STYLES = {
 };
 
 function Badge({ value, map }) {
-  const s = map[value] ?? { background: '#f3f4f6', color: '#374151' };
+  const s = map[value] ?? { background: '#f3f4f6', color: '#4b5563' };
   return (
     <span style={{ padding: '2px 10px', borderRadius: 12, fontSize: 12, fontWeight: 600, background: s.background, color: s.color, whiteSpace: 'nowrap' }}>
       {value}
@@ -53,8 +53,8 @@ function SortableCase({ item, onRemove }) {
       style={{
         display: 'flex', alignItems: 'center', gap: 12,
         padding: '11px 14px',
-        background: isDragging ? '#eff6ff' : '#fff',
-        border: `1px solid ${isDragging ? '#93c5fd' : '#e5e7eb'}`,
+        background: isDragging ? 'var(--surface-hover)' : 'var(--surface)',
+        border: `1px solid ${isDragging ? '#93c5fd' : 'var(--border)'}`,
         borderRadius: 7,
         marginBottom: 6,
         transform: CSS.Transform.toString(transform),
@@ -67,16 +67,16 @@ function SortableCase({ item, onRemove }) {
       <button
         {...attributes}
         {...listeners}
-        style={{ background: 'none', border: 'none', cursor: 'grab', padding: '2px 4px', color: '#d1d5db', display: 'flex', flexShrink: 0, touchAction: 'none' }}
+        style={{ background: 'none', border: 'none', cursor: 'grab', padding: '2px 4px', color: 'var(--text-faint)', display: 'flex', flexShrink: 0, touchAction: 'none' }}
       >
         <GripVertical size={15} />
       </button>
-      <span style={{ flex: 1, fontSize: 14, fontWeight: 500, color: '#111827' }}>{item.title}</span>
+      <span style={{ flex: 1, fontSize: 14, fontWeight: 500, color: 'var(--text)' }}>{item.title}</span>
       <Badge value={item.severity} map={SEVERITY_STYLES} />
       <Badge value={item.status} map={TC_STATUS_STYLES} />
       <button
         onClick={() => onRemove(item.id)}
-        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#d1d5db', padding: '3px 5px', display: 'flex', borderRadius: 4, marginLeft: 4, flexShrink: 0 }}
+        style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-faint)', padding: '3px 5px', display: 'flex', borderRadius: 4, marginLeft: 4, flexShrink: 0 }}
         onMouseEnter={e => e.currentTarget.style.color = '#ef4444'}
         onMouseLeave={e => e.currentTarget.style.color = '#d1d5db'}
       >
@@ -207,8 +207,8 @@ export default function TestSuiteDetail() {
     }
   }
 
-  if (loading)   return <div style={{ padding: '48px 32px', textAlign: 'center', color: '#9ca3af' }}>Loading…</div>;
-  if (notFound)  return <div style={{ padding: '48px 32px', textAlign: 'center', color: '#9ca3af' }}>Suite not found.</div>;
+  if (loading)   return <div style={{ padding: '48px 32px', textAlign: 'center', color: 'var(--text-faint)' }}>Loading…</div>;
+  if (notFound)  return <div style={{ padding: '48px 32px', textAlign: 'center', color: 'var(--text-faint)' }}>Suite not found.</div>;
   if (fetchError) return (
     <div style={{ padding: '48px 32px', maxWidth: 860, margin: '0 auto' }}>
       <div style={{ background: '#fee2e2', color: '#dc2626', padding: '14px 18px', borderRadius: 6, fontSize: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -223,7 +223,7 @@ export default function TestSuiteDetail() {
       {/* Back */}
       <button
         onClick={() => navigate('/test-suites')}
-        style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280', fontSize: 14, padding: 0, marginBottom: 22 }}
+        style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--canvas-muted)', fontSize: 14, padding: 0, marginBottom: 22 }}
       >
         <ArrowLeft size={15} /> Back to Test Suites
       </button>
@@ -233,9 +233,9 @@ export default function TestSuiteDetail() {
         <div>
           <h1 style={{ margin: '0 0 8px', fontSize: 22, fontWeight: 700 }}>{suite.name}</h1>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 14 }}>
-            <span style={{ color: '#6b7280' }}>Feature: <strong style={{ color: '#374151' }}>{suite.feature}</strong></span>
+            <span style={{ color: 'var(--canvas-muted)' }}>Feature: <strong style={{ color: 'var(--canvas-strong)' }}>{suite.feature}</strong></span>
             <Badge value={suite.status} map={SUITE_STATUS_STYLES} />
-            {saving && <span style={{ fontSize: 12, color: '#9ca3af', fontStyle: 'italic' }}>Saving…</span>}
+            {saving && <span style={{ fontSize: 12, color: 'var(--text-faint)', fontStyle: 'italic' }}>Saving…</span>}
           </div>
         </div>
         <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
@@ -249,13 +249,13 @@ export default function TestSuiteDetail() {
           </button>
           <button
             onClick={() => setEditOpen(true)}
-            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 6, border: '1px solid #d1d5db', background: '#fff', cursor: 'pointer', fontSize: 14 }}
+            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 6, border: '1px solid var(--border)', background: 'var(--surface)', cursor: 'pointer', fontSize: 14 }}
           >
             <Pencil size={13} /> Edit
           </button>
           <button
             onClick={handleDelete}
-            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 6, border: '1px solid #fca5a5', background: '#fff', color: '#dc2626', cursor: 'pointer', fontSize: 14 }}
+            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 6, border: '1px solid #fca5a5', background: 'var(--surface)', color: '#dc2626', cursor: 'pointer', fontSize: 14 }}
           >
             <Trash2 size={13} /> Delete
           </button>
@@ -273,7 +273,7 @@ export default function TestSuiteDetail() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
         <h2 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>
           Test Cases{' '}
-          <span style={{ fontWeight: 400, color: '#9ca3af', fontSize: 14 }}>({cases.length})</span>
+          <span style={{ fontWeight: 400, color: 'var(--text-faint)', fontSize: 14 }}>({cases.length})</span>
         </h2>
         <button
           onClick={() => setAddOpen(true)}
@@ -285,7 +285,7 @@ export default function TestSuiteDetail() {
 
       {/* Empty state */}
       {cases.length === 0 && (
-        <div style={{ padding: '44px 0', textAlign: 'center', color: '#9ca3af', fontSize: 14, border: '2px dashed #e5e7eb', borderRadius: 8 }}>
+        <div style={{ padding: '44px 0', textAlign: 'center', color: 'var(--text-faint)', fontSize: 14, border: '2px dashed #e5e7eb', borderRadius: 8 }}>
           No test cases in this suite. Click "Add Cases" to get started.
         </div>
       )}
@@ -300,7 +300,7 @@ export default function TestSuiteDetail() {
       </DndContext>
 
       {cases.length > 0 && (
-        <p style={{ fontSize: 12, color: '#9ca3af', marginTop: 10 }}>Drag rows to reorder. Changes save automatically.</p>
+        <p style={{ fontSize: 12, color: 'var(--text-faint)', marginTop: 10 }}>Drag rows to reorder. Changes save automatically.</p>
       )}
 
       {editOpen && (

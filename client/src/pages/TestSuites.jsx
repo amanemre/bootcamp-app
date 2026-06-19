@@ -4,7 +4,7 @@ import { Plus } from 'lucide-react';
 import SuiteModal from '../components/SuiteModal';
 
 const STATUS_STYLES = {
-  Draft:          { background: '#f3f4f6', color: '#6b7280' },
+  Draft:          { background: '#f3f4f6', color: '#4b5563' },
   Ready:          { background: '#dbeafe', color: '#1d4ed8' },
   'In Progress':  { background: '#fef9c3', color: '#854d0e' },
   Passed:         { background: '#dcfce7', color: '#16a34a' },
@@ -12,7 +12,7 @@ const STATUS_STYLES = {
 };
 
 function Badge({ value }) {
-  const s = STATUS_STYLES[value] ?? { background: '#f3f4f6', color: '#374151' };
+  const s = STATUS_STYLES[value] ?? { background: '#f3f4f6', color: '#4b5563' };
   return (
     <span style={{ padding: '2px 10px', borderRadius: 12, fontSize: 12, fontWeight: 600, background: s.background, color: s.color, whiteSpace: 'nowrap' }}>
       {value}
@@ -20,12 +20,7 @@ function Badge({ value }) {
   );
 }
 
-function formatDate(str) {
-  const d = new Date(str.replace(' ', 'T') + 'Z');
-  const date = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-  const time = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-  return `${date} ${time}`;
-}
+import { formatDateTime as formatDate } from '../utils/datetime';
 
 export default function TestSuites() {
   const navigate = useNavigate();
@@ -72,7 +67,7 @@ export default function TestSuites() {
         <select
           value={statusFilter}
           onChange={e => setStatusFilter(e.target.value)}
-          style={{ padding: '8px 12px', borderRadius: 6, border: '1px solid #d1d5db', fontSize: 14, background: '#fff' }}
+          style={{ padding: '8px 12px', borderRadius: 6, border: '1px solid var(--border)', fontSize: 14, background: 'var(--surface)' }}
         >
           <option value="">All Statuses</option>
           {['Draft', 'Ready', 'In Progress', 'Passed', 'Failed'].map(s => <option key={s}>{s}</option>)}
@@ -87,10 +82,10 @@ export default function TestSuites() {
       )}
 
       {/* Table */}
-      <div style={{ border: '1px solid #e5e7eb', borderRadius: 8, overflow: 'hidden', background: '#fff' }}>
+      <div style={{ border: '1px solid var(--border)', borderRadius: 8, overflow: 'hidden', background: 'var(--surface)' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
           <thead>
-            <tr style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
+            <tr style={{ background: 'var(--surface-alt)', borderBottom: '1px solid var(--border)' }}>
               <th style={th}>Name</th>
               <th style={{ ...th, width: 200 }}>Feature</th>
               <th style={{ ...th, width: 120 }}>Status</th>
@@ -100,29 +95,29 @@ export default function TestSuites() {
           </thead>
           <tbody>
             {loading && (
-              <tr><td colSpan={5} style={{ padding: 40, textAlign: 'center', color: '#9ca3af' }}>Loading…</td></tr>
+              <tr><td colSpan={5} style={{ padding: 40, textAlign: 'center', color: 'var(--text-faint)' }}>Loading…</td></tr>
             )}
             {!loading && suites.length === 0 && (
-              <tr><td colSpan={5} style={{ padding: 40, textAlign: 'center', color: '#9ca3af' }}>No test suites found.</td></tr>
+              <tr><td colSpan={5} style={{ padding: 40, textAlign: 'center', color: 'var(--text-faint)' }}>No test suites found.</td></tr>
             )}
             {!loading && suites.map((suite, i) => (
               <tr
                 key={suite.id}
                 onClick={() => navigate(`/test-suites/${suite.id}`)}
-                style={{ background: i % 2 ? '#fafafa' : '#fff', borderBottom: '1px solid #f3f4f6', cursor: 'pointer' }}
+                style={{ background: i % 2 ? 'var(--surface-alt)' : 'var(--surface)', borderBottom: '1px solid var(--border-subtle)', cursor: 'pointer' }}
               >
                 <td style={{ ...td, fontWeight: 500 }}>{suite.name}</td>
-                <td style={{ ...td, color: '#6b7280' }}>{suite.feature}</td>
+                <td style={{ ...td, color: 'var(--text-muted)' }}>{suite.feature}</td>
                 <td style={td}><Badge value={suite.status} /></td>
-                <td style={{ ...td, textAlign: 'center', color: '#6b7280' }}>{suite.case_count}</td>
-                <td style={{ ...td, color: '#9ca3af', fontSize: 13 }}>{formatDate(suite.updated_at)}</td>
+                <td style={{ ...td, textAlign: 'center', color: 'var(--text-muted)' }}>{suite.case_count}</td>
+                <td style={{ ...td, color: 'var(--text-faint)', fontSize: 13 }}>{formatDate(suite.updated_at)}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      <div style={{ marginTop: 12, fontSize: 13, color: '#6b7280' }}>
+      <div style={{ marginTop: 12, fontSize: 13, color: 'var(--canvas-muted)' }}>
         {suites.length} suite{suites.length !== 1 ? 's' : ''}
       </div>
 
@@ -136,5 +131,5 @@ export default function TestSuites() {
   );
 }
 
-const th = { padding: '10px 16px', textAlign: 'left', fontWeight: 600, fontSize: 13, color: '#374151' };
+const th = { padding: '10px 16px', textAlign: 'left', fontWeight: 600, fontSize: 13, color: 'var(--text-secondary)' };
 const td = { padding: '12px 16px', verticalAlign: 'middle' };

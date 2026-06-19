@@ -2,16 +2,17 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Upload, Download, Pencil, Trash2, MoreVertical, ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
 import TestCaseModal from '../components/TestCaseModal';
+import { useSettings } from '../context/SettingsContext';
 
 const SEVERITY_STYLES = {
   Critical: { background: '#fee2e2', color: '#dc2626' },
   Major:    { background: '#ffedd5', color: '#ea580c' },
   Minor:    { background: '#fef9c3', color: '#854d0e' },
-  Trivial:  { background: '#f3f4f6', color: '#6b7280' },
+  Trivial:  { background: '#f3f4f6', color: '#4b5563' },
 };
 
 const STATUS_STYLES = {
-  Draft:   { background: '#f3f4f6', color: '#6b7280' },
+  Draft:   { background: '#f3f4f6', color: '#4b5563' },
   Ready:   { background: '#dbeafe', color: '#1d4ed8' },
   Passed:  { background: '#dcfce7', color: '#16a34a' },
   Failed:  { background: '#fee2e2', color: '#dc2626' },
@@ -19,7 +20,7 @@ const STATUS_STYLES = {
 };
 
 function Badge({ value, map }) {
-  const s = map[value] ?? { background: '#f3f4f6', color: '#374151' };
+  const s = map[value] ?? { background: '#f3f4f6', color: '#4b5563' };
   return (
     <span style={{ padding: '2px 10px', borderRadius: 12, fontSize: 12, fontWeight: 600, background: s.background, color: s.color, whiteSpace: 'nowrap' }}>
       {value}
@@ -33,12 +34,7 @@ function SortIcon({ field, sort, order }) {
   return <Icon size={13} style={{ marginLeft: 4 }} />;
 }
 
-function formatDate(str) {
-  const d = new Date(str.replace(' ', 'T') + 'Z');
-  const date = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-  const time = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-  return `${date} ${time}`;
-}
+import { formatDateTime as formatDate } from '../utils/datetime';
 
 export default function TestCases() {
   const navigate = useNavigate();
@@ -54,17 +50,22 @@ export default function TestCases() {
   const [openMenuId, setOpenMenuId] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [editTarget, setEditTarget] = useState(null);
+  const { settings } = useSettings();
+  const pageSize = settings.default_page_size || 20;
 
-  const totalPages = Math.max(1, Math.ceil(total / 20));
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
   useEffect(() => {
     const t = setTimeout(() => { setDebouncedSearch(search); setPage(1); }, 300);
     return () => clearTimeout(t);
   }, [search]);
 
+  // Reset to the first page when the preferred page size changes.
+  useEffect(() => { setPage(1); }, [pageSize]);
+
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const params = new URLSearchParams({ page, sort, order });
+    const params = new URLSearchParams({ page, sort, order, pageSize });
     if (statusFilter) params.set('status', statusFilter);
     if (debouncedSearch) params.set('search', debouncedSearch);
     try {
@@ -74,7 +75,7 @@ export default function TestCases() {
     } finally {
       setLoading(false);
     }
-  }, [page, sort, order, statusFilter, debouncedSearch]);
+  }, [page, sort, order, statusFilter, debouncedSearch, pageSize]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
@@ -119,13 +120,13 @@ export default function TestCases() {
           <button
             onClick={handleExport}
             title="Export the current filtered set to CSV"
-            style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#fff', color: '#374151', border: '1px solid #d1d5db', padding: '8px 16px', borderRadius: 6, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}
+            style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'var(--surface)', color: 'var(--text-secondary)', border: '1px solid var(--border)', padding: '8px 16px', borderRadius: 6, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}
           >
             <Download size={15} /> Download CSV
           </button>
           <button
             onClick={() => navigate('/test-cases/import')}
-            style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#fff', color: '#374151', border: '1px solid #d1d5db', padding: '8px 16px', borderRadius: 6, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}
+            style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'var(--surface)', color: 'var(--text-secondary)', border: '1px solid var(--border)', padding: '8px 16px', borderRadius: 6, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}
           >
             <Upload size={15} /> Import CSV
           </button>
@@ -145,12 +146,12 @@ export default function TestCases() {
           placeholder="Search by title…"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          style={{ flex: 1, padding: '8px 12px', borderRadius: 6, border: '1px solid #d1d5db', fontSize: 14 }}
+          style={{ flex: 1, padding: '8px 12px', borderRadius: 6, border: '1px solid var(--border)', fontSize: 14 }}
         />
         <select
           value={statusFilter}
           onChange={e => { setStatusFilter(e.target.value); setPage(1); }}
-          style={{ padding: '8px 12px', borderRadius: 6, border: '1px solid #d1d5db', fontSize: 14, minWidth: 160, background: '#fff' }}
+          style={{ padding: '8px 12px', borderRadius: 6, border: '1px solid var(--border)', fontSize: 14, minWidth: 160, background: 'var(--surface)' }}
         >
           <option value="">All Statuses</option>
           {['Draft', 'Ready', 'Passed', 'Failed', 'Skipped'].map(s => <option key={s}>{s}</option>)}
@@ -158,10 +159,10 @@ export default function TestCases() {
       </div>
 
       {/* Table */}
-      <div style={{ border: '1px solid #e5e7eb', borderRadius: 8, overflow: 'hidden', background: '#fff' }}>
+      <div style={{ border: '1px solid var(--border)', borderRadius: 8, overflow: 'hidden', background: 'var(--surface)' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
           <thead>
-            <tr style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
+            <tr style={{ background: 'var(--surface-alt)', borderBottom: '1px solid var(--border)' }}>
               <th style={th}>Title</th>
               <th style={{ ...th, width: 120, cursor: 'pointer', userSelect: 'none' }} onClick={() => toggleSort('severity')}>
                 <span style={{ display: 'flex', alignItems: 'center' }}>Severity <SortIcon field="severity" sort={sort} order={order} /></span>
@@ -175,10 +176,10 @@ export default function TestCases() {
           </thead>
           <tbody>
             {loading && (
-              <tr><td colSpan={5} style={{ padding: 40, textAlign: 'center', color: '#9ca3af' }}>Loading…</td></tr>
+              <tr><td colSpan={5} style={{ padding: 40, textAlign: 'center', color: 'var(--text-faint)' }}>Loading…</td></tr>
             )}
             {!loading && items.length === 0 && (
-              <tr><td colSpan={5} style={{ padding: 40, textAlign: 'center', color: '#9ca3af' }}>No test cases found.</td></tr>
+              <tr><td colSpan={5} style={{ padding: 40, textAlign: 'center', color: 'var(--text-faint)' }}>No test cases found.</td></tr>
             )}
             {!loading && items.map((item, i) => {
               const openUpward = i >= items.length - 2;
@@ -186,21 +187,21 @@ export default function TestCases() {
                 <tr
                   key={item.id}
                   onClick={() => { setEditTarget(item); setModalOpen(true); }}
-                  style={{ background: i % 2 ? '#fafafa' : '#fff', borderBottom: '1px solid #f3f4f6', cursor: 'pointer' }}
+                  style={{ background: i % 2 ? 'var(--surface-alt)' : 'var(--surface)', borderBottom: '1px solid var(--border-subtle)', cursor: 'pointer' }}
                 >
                   <td style={td}>{item.title}</td>
                   <td style={td}><Badge value={item.severity} map={SEVERITY_STYLES} /></td>
                   <td style={td}><Badge value={item.status} map={STATUS_STYLES} /></td>
-                  <td style={{ ...td, color: '#9ca3af', fontSize: 13 }}>{formatDate(item.updated_at)}</td>
+                  <td style={{ ...td, color: 'var(--text-faint)', fontSize: 13 }}>{formatDate(item.updated_at)}</td>
                   <td style={{ ...td, position: 'relative' }} onClick={e => e.stopPropagation()}>
                     <button
                       onClick={e => { e.stopPropagation(); setOpenMenuId(openMenuId === item.id ? null : item.id); }}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px 6px', color: '#9ca3af', borderRadius: 4, display: 'flex' }}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px 6px', color: 'var(--text-faint)', borderRadius: 4, display: 'flex' }}
                     >
                       <MoreVertical size={16} />
                     </button>
                     {openMenuId === item.id && (
-                      <div style={{ position: 'absolute', right: 8, zIndex: 200, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 6, boxShadow: '0 4px 16px rgba(0,0,0,0.1)', minWidth: 130, overflow: 'hidden', ...(openUpward ? { bottom: 36 } : { top: 36 }) }}>
+                      <div style={{ position: 'absolute', right: 8, zIndex: 200, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 6, boxShadow: '0 4px 16px rgba(0,0,0,0.1)', minWidth: 130, overflow: 'hidden', ...(openUpward ? { bottom: 36 } : { top: 36 }) }}>
                         <button onClick={() => { setEditTarget(item); setModalOpen(true); setOpenMenuId(null); }} style={menuItem}>
                           <Pencil size={13} /> Edit
                         </button>
@@ -218,7 +219,7 @@ export default function TestCases() {
       </div>
 
       {/* Pagination */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 14, fontSize: 13, color: '#6b7280' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 14, fontSize: 13, color: 'var(--canvas-muted)' }}>
         <span>{total} test case{total !== 1 ? 's' : ''}</span>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <button disabled={page <= 1} onClick={() => setPage(p => p - 1)} style={pageBtn(page <= 1)}>← Previous</button>
@@ -238,9 +239,9 @@ export default function TestCases() {
   );
 }
 
-const th = { padding: '10px 16px', textAlign: 'left', fontWeight: 600, fontSize: 13, color: '#374151' };
+const th = { padding: '10px 16px', textAlign: 'left', fontWeight: 600, fontSize: 13, color: 'var(--text-secondary)' };
 const td = { padding: '12px 16px', verticalAlign: 'middle' };
-const menuItem = { display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '9px 14px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: '#374151', textAlign: 'left' };
+const menuItem = { display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '9px 14px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: 'var(--text-secondary)', textAlign: 'left' };
 function pageBtn(disabled) {
-  return { padding: '5px 12px', borderRadius: 5, border: '1px solid #d1d5db', background: disabled ? '#f9fafb' : '#fff', color: disabled ? '#d1d5db' : '#374151', cursor: disabled ? 'default' : 'pointer', fontSize: 13 };
+  return { padding: '5px 12px', borderRadius: 5, border: '1px solid var(--border)', background: disabled ? 'var(--surface-alt)' : 'var(--surface)', color: disabled ? 'var(--text-faint)' : 'var(--text-secondary)', cursor: disabled ? 'default' : 'pointer', fontSize: 13 };
 }

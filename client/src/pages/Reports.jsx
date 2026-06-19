@@ -1,15 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-function formatDate(str) {
-  if (!str) return '—';
-  const d = new Date(str.replace(' ', 'T') + 'Z');
-  if (Number.isNaN(d.getTime())) return '—';
-  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-}
+import { formatDate } from '../utils/datetime';
 
 function CountPill({ count, color }) {
-  if (!count) return <span style={{ fontSize: 13, color: '#d1d5db' }}>—</span>;
+  if (!count) return <span style={{ fontSize: 13, color: 'var(--text-faint)' }}>—</span>;
   return <span style={{ fontSize: 13, fontWeight: 600, color }}>{count}</span>;
 }
 
@@ -49,53 +44,53 @@ export default function Reports() {
         </div>
       )}
 
-      <div style={{ border: '1px solid #e5e7eb', borderRadius: 8, overflow: 'hidden', background: '#fff' }}>
+      <div style={{ border: '1px solid var(--border)', borderRadius: 8, overflow: 'hidden', background: 'var(--surface)' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
           <thead>
-            <tr style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
+            <tr style={{ background: 'var(--surface-alt)', borderBottom: '1px solid var(--border)' }}>
               <th style={{ ...th, width: 70 }}>Report</th>
               <th style={th}>Suite</th>
               <th style={{ ...th, width: 120 }}>Run Date</th>
               <th style={{ ...th, width: 120 }}>Generated</th>
               <th style={{ ...th, width: 60, textAlign: 'center' }}>Total</th>
-              <th style={{ ...th, width: 60, textAlign: 'center', color: '#16a34a' }}>Pass</th>
-              <th style={{ ...th, width: 60, textAlign: 'center', color: '#dc2626' }}>Fail</th>
-              <th style={{ ...th, width: 60, textAlign: 'center', color: '#7e22ce' }}>Skip</th>
+              <th style={{ ...th, width: 60, textAlign: 'center', color: 'var(--status-pass)' }}>Pass</th>
+              <th style={{ ...th, width: 60, textAlign: 'center', color: 'var(--status-fail)' }}>Fail</th>
+              <th style={{ ...th, width: 60, textAlign: 'center', color: 'var(--status-skip)' }}>Skip</th>
             </tr>
           </thead>
           <tbody>
-            {loading && <tr><td colSpan={8} style={{ padding: 40, textAlign: 'center', color: '#9ca3af' }}>Loading…</td></tr>}
+            {loading && <tr><td colSpan={8} style={{ padding: 40, textAlign: 'center', color: 'var(--text-faint)' }}>Loading…</td></tr>}
             {!loading && reports.length === 0 && !fetchError && (
-              <tr><td colSpan={8} style={{ padding: 40, textAlign: 'center', color: '#9ca3af' }}>
+              <tr><td colSpan={8} style={{ padding: 40, textAlign: 'center', color: 'var(--text-faint)' }}>
                 No reports yet. Open a completed test run and click “Generate report” to create one.
               </td></tr>
             )}
             {!loading && reports.map((rep, i) => (
               <tr key={rep.id} onClick={() => navigate(`/reports/${rep.id}`)}
-                style={{ background: i % 2 ? '#fafafa' : '#fff', borderBottom: '1px solid #f3f4f6', cursor: 'pointer' }}
-                onMouseEnter={e => e.currentTarget.style.background = '#f0f9ff'}
-                onMouseLeave={e => e.currentTarget.style.background = i % 2 ? '#fafafa' : '#fff'}
+                style={{ background: i % 2 ? 'var(--surface-alt)' : 'var(--surface)', borderBottom: '1px solid var(--border-subtle)', cursor: 'pointer' }}
+                onMouseEnter={e => e.currentTarget.style.background = 'var(--surface-hover)'}
+                onMouseLeave={e => e.currentTarget.style.background = i % 2 ? 'var(--surface-alt)' : 'var(--surface)'}
               >
-                <td style={{ ...td, fontWeight: 600, color: '#2563eb' }}>#{rep.id}</td>
+                <td style={{ ...td, fontWeight: 600, color: 'var(--link)' }}>#{rep.id}</td>
                 <td style={{ ...td, fontWeight: 500 }}>{rep.suite_name || '—'}</td>
-                <td style={{ ...td, color: '#6b7280', fontSize: 13 }}>{formatDate(rep.run_date)}</td>
-                <td style={{ ...td, color: '#9ca3af', fontSize: 13 }}>{formatDate(rep.generated_at)}</td>
+                <td style={{ ...td, color: 'var(--text-muted)', fontSize: 13 }}>{formatDate(rep.run_date)}</td>
+                <td style={{ ...td, color: 'var(--text-faint)', fontSize: 13 }}>{formatDate(rep.generated_at)}</td>
                 <td style={{ ...td, textAlign: 'center', fontWeight: 600 }}>{rep.total_count}</td>
-                <td style={{ ...td, textAlign: 'center' }}><CountPill count={rep.passed_count} color="#16a34a" /></td>
-                <td style={{ ...td, textAlign: 'center' }}><CountPill count={rep.failed_count} color="#dc2626" /></td>
-                <td style={{ ...td, textAlign: 'center' }}><CountPill count={rep.skipped_count} color="#7e22ce" /></td>
+                <td style={{ ...td, textAlign: 'center' }}><CountPill count={rep.passed_count} color="var(--status-pass)" /></td>
+                <td style={{ ...td, textAlign: 'center' }}><CountPill count={rep.failed_count} color="var(--status-fail)" /></td>
+                <td style={{ ...td, textAlign: 'center' }}><CountPill count={rep.skipped_count} color="var(--status-skip)" /></td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      <div style={{ marginTop: 12, fontSize: 13, color: '#6b7280' }}>
+      <div style={{ marginTop: 12, fontSize: 13, color: 'var(--canvas-muted)' }}>
         {reports.length} report{reports.length !== 1 ? 's' : ''}
       </div>
     </div>
   );
 }
 
-const th = { padding: '10px 16px', textAlign: 'left', fontWeight: 600, fontSize: 13, color: '#374151' };
+const th = { padding: '10px 16px', textAlign: 'left', fontWeight: 600, fontSize: 13, color: 'var(--text-secondary)' };
 const td = { padding: '12px 16px', verticalAlign: 'middle' };
