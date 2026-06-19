@@ -13,15 +13,33 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: anthropics/claude-code-action@v1
+
+      - name: Install Claude Code
+        run: curl -fsSL https://claude.ai/install.sh | bash -s -- 2.1.183
+
+      - name: Write Claude credentials
+        run: |
+          mkdir -p ~/.claude
+          printf '{"claudeAiOauth":{"accessToken":"%s","expiresAt":9999999999}}' \
+            "$CLAUDE_CODE_OAUTH_TOKEN" > ~/.claude/.credentials.json
+          chmod 600 ~/.claude/.credentials.json
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+
+      - name: QA review
         env:
           GH_TOKEN: ${{ github.token }}
-        with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          github_token: ${{ github.token }}
-          claude_args: '--allowedTools "Bash(gh:*),Read,Grep,Glob"'
-          prompt: |
-            Run `gh pr diff ${{ github.event.pull_request.number }}` to read this PR's diff,
-            then use the qa-review skill to perform a QA review of it.
-            Post the full review as ONE PR comment by running:
-            gh pr comment ${{ github.event.pull_request.number }} --body "REVIEW_TEXT"
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          gh pr diff "$PR_NUMBER" > /tmp/pr-diff.txt
+          {
+            printf 'You are a QA engineer reviewing a pull request. Read the diff and write a structured review.\n\n'
+            printf '## Test Cases to Verify\nNumbered list of specific scenarios a tester must run.\n\n'
+            printf '## Potential Issues\nBugs or edge cases visible in the diff. If none, write "None identified."\n\n'
+            printf '## Risk Assessment\nSeverity (Critical / Major / Minor / Trivial) and one-sentence justification.\n\n'
+            printf 'Write in direct, active voice. State facts only.\n\nDiff:\n'
+            cat /tmp/pr-diff.txt
+          } > /tmp/prompt.txt
+          REVIEW=$(claude -p --output-format text "$(cat /tmp/prompt.txt)")
+          gh pr comment "$PR_NUMBER" --body "$REVIEW"
