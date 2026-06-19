@@ -83,6 +83,7 @@ export default function TestSuites() {
 
       {/* Table */}
       <div style={{ border: '1px solid var(--border)', borderRadius: 8, overflow: 'hidden', background: 'var(--surface)' }}>
+        <div className="table-scroll">
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
           <thead>
             <tr style={{ background: 'var(--surface-alt)', borderBottom: '1px solid var(--border)' }}>
@@ -115,6 +116,7 @@ export default function TestSuites() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
 
       <div style={{ marginTop: 12, fontSize: 13, color: 'var(--canvas-muted)' }}>

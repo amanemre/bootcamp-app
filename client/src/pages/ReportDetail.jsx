@@ -154,6 +154,7 @@ export default function ReportDetail() {
 
       {/* Per-case results */}
       <div style={{ border: '1px solid var(--border)', borderRadius: 8, overflow: 'hidden', background: 'var(--surface)' }}>
+        <div className="table-scroll">
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
           <thead>
             <tr style={{ background: 'var(--surface-alt)', borderBottom: '1px solid var(--border)' }}>
@@ -189,6 +190,7 @@ export default function ReportDetail() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );

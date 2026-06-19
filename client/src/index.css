@@ -43,3 +43,56 @@ button, input, select, textarea { font-family: inherit; }
 }
 
 [data-theme="dark"] h1 { color: var(--canvas-heading); }
+
+/* ── Navigation ───────────────────────────────────────────────────────────── */
+.nav-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 14px;
+  white-space: nowrap;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.nav-link:not(.nav-link--active):hover {
+  background: rgba(107, 114, 128, 0.09);
+}
+[data-theme="dark"] .nav-link:not(.nav-link--active):hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.nav-search-btn {
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+.nav-search-btn:hover {
+  filter: brightness(0.96);
+}
+[data-theme="dark"] .nav-search-btn:hover {
+  filter: brightness(1.1);
+}
+
+.nav-mobile-link {
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.nav-mobile-link:not(.nav-mobile-link--active):hover {
+  background: rgba(107, 114, 128, 0.09);
+}
+[data-theme="dark"] .nav-mobile-link:not(.nav-mobile-link--active):hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+/* ── Table horizontal scroll ──────────────────────────────────────────────── */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.table-scroll > table {
+  min-width: max-content;
+}
+
+/* ── Responsive nav ───────────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .nav-desktop   { display: none !important; }
+  .nav-hamburger { display: flex !important; }
+}

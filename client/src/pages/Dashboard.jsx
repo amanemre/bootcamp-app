@@ -235,6 +235,7 @@ export default function Dashboard() {
                   hint="Open a test suite and start a run — results will show up here."
                 />
               ) : (
+                <div className="table-scroll">
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
                   <thead>
                     <tr style={{ background: 'var(--surface-alt)', borderBottom: '1px solid var(--border)' }}>
@@ -263,6 +264,7 @@ export default function Dashboard() {
                     ))}
                   </tbody>
                 </table>
+                </div>
               )}
             </div>
 

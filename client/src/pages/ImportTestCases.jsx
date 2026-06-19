@@ -193,6 +193,7 @@ export default function ImportTestCases() {
               )}
 
               <div style={{ border: '1px solid var(--border)', borderRadius: 8, overflow: 'hidden' }}>
+                <div className="table-scroll">
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13.5 }}>
                   <thead>
                     <tr style={{ background: 'var(--surface-alt)', borderBottom: '1px solid var(--border)' }}>
@@ -226,6 +227,7 @@ export default function ImportTestCases() {
                     ))}
                   </tbody>
                 </table>
+                </div>
               </div>
               <p style={{ fontSize: 12.5, color: 'var(--text-faint)', margin: '12px 0 0' }}>
                 Only valid rows are imported. Duplicates (titles that already exist) are imported but flagged above.
