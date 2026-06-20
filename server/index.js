@@ -1,4 +1,5 @@
 // smoke test: verifying the PR auto-review workflow (safe to revert)
+const path    = require('path');
 const express = require('express');
 const testCasesRouter = require('./routes/test-cases');
 const suitesRouter    = require('./routes/suites');
@@ -32,6 +33,20 @@ app.use('/api/dashboard',  dashboardRouter);
 app.use('/api/reports',    reportsRouter);
 app.use('/api/settings',   settingsRouter);
 app.use('/api/search',     searchRouter);
+
+// Serve the built React app
+const clientDist = path.join(__dirname, '../client/dist');
+app.use(express.static(clientDist));
+
+// Return 404 JSON for unmatched API routes instead of falling through to index.html
+app.all('/api/*', (_req, res) => {
+  res.status(404).json({ success: false, data: null, error: 'Not found' });
+});
+
+// Catch-all — let React Router handle client-side navigation
+app.get('*', (_req, res) => {
+  res.sendFile(path.join(clientDist, 'index.html'));
+});
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
