@@ -1,0 +1,37 @@
+{
+  "name": "qa-command-center-plugin",
+  "version": "1.0.0",
+  "description": "QA Command Center Claude Code assets: agents, commands, skills, hooks, and MCP config for structured QA workflows and flaky test detection.",
+  "assets": {
+    "agents": [
+      "agents/test-writer.md",
+      "agents/bug-reporter.md",
+      "agents/qa-reviewer.md",
+      "agents/flake-analyzer.md"
+    ],
+    "commands": [
+      "commands/new-method.md",
+      "commands/bug-report.md",
+      "commands/new-test.md"
+    ],
+    "skills": [
+      "skills/test-generator/SKILL.md",
+      "skills/qa-review/SKILL.md",
+      "skills/bug-report-generator/SKILL.md"
+    ],
+    "hooks": [
+      "hooks/check-response-shape.sh",
+      "hooks/check-severity-enum.sh",
+      "hooks/check-js-build.sh",
+      "hooks/flaky-test-detector.sh"
+    ],
+    "mcp": [
+      "mcp/mcp-template.json"
+    ]
+  },
+  "env_required": [
+    "DISCORD_BOT_TOKEN",
+    "DISCORD_FLAKY_CHANNEL_ID"
+  ],
+  "install": "Copy the contents of this plugin/ directory into your project's .claude/ directory (agents/, commands/, skills/, hooks/). Merge the hooks section from mcp/settings-hooks.json into your .claude/settings.json. Add DISCORD_BOT_TOKEN and DISCORD_FLAKY_CHANNEL_ID to your .env file."
+}

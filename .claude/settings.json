@@ -17,6 +17,15 @@
             "command": ".claude/hooks/check-js-build.sh"
           }
         ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/flaky-test-detector.sh"
+          }
+        ]
       }
     ]
   }

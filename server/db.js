@@ -129,6 +129,24 @@ db.exec(`
   )
 `);
 
+db.exec(`
+  CREATE TABLE IF NOT EXISTS test_case_stats (
+    test_case_id    INTEGER PRIMARY KEY REFERENCES test_cases(id) ON DELETE CASCADE,
+    total_runs      INTEGER NOT NULL DEFAULT 0,
+    passed_runs     INTEGER NOT NULL DEFAULT 0,
+    failed_runs     INTEGER NOT NULL DEFAULT 0,
+    skipped_runs    INTEGER NOT NULL DEFAULT 0,
+    decisive        INTEGER NOT NULL DEFAULT 0,
+    pass_rate       REAL,
+    flakiness_score REAL DEFAULT 0,
+    flakiness_label TEXT DEFAULT 'Stable',
+    ai_hypothesis   TEXT DEFAULT '',
+    history         TEXT DEFAULT '[]',
+    trend           TEXT DEFAULT 'stable',
+    updated_at      TEXT DEFAULT (datetime('now'))
+  )
+`);
+
 // Migration: expand bug_activity.action to include 'field_change'
 const activitySchema = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='bug_activity'").get();
 if (activitySchema && !activitySchema.sql.includes('field_change')) {

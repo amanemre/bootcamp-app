@@ -12,6 +12,7 @@ const PRIMARY_LINKS = [
   { to: '/test-runs',   label: 'Runs'                 },
   { to: '/bugs',        label: 'Bugs'                 },
   { to: '/reports',     label: 'Reports'              },
+  { to: '/flaky-tests', label: 'Flaky Tests'          },
 ];
 
 export default function Nav() {

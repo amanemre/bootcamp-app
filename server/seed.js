@@ -1,4 +1,5 @@
 const db = require('./db');
+const { refreshStats } = require('./routes/flaky-tests');
 
 module.exports = function seed() {
   // --- Test cases ---
@@ -212,4 +213,130 @@ module.exports = function seed() {
 
     console.log('Seeded 1 report.');
   }
+
+  seedFlaky();
 };
+
+function seedFlaky() {
+  const { n } = db.prepare('SELECT COUNT(*) AS n FROM test_case_stats').get();
+  if (n > 0) return;
+
+  // Five additional test cases for flakiness demonstration
+  const insertTC = db.prepare(`
+    INSERT INTO test_cases (title, preconditions, steps, expected_result, severity, status)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `);
+
+  const tc6 = insertTC.run(
+    'Concurrent login attempts fail under load',
+    'A load-testing environment with at least 10 concurrent sessions is available.',
+    JSON.stringify(['Start 10 concurrent login requests with valid credentials.', 'Observe the response for each session.']),
+    'All 10 sessions receive a successful authentication response. No session receives a 500 or 429 error.',
+    'Critical', 'Ready'
+  );
+  const tc7 = insertTC.run(
+    'Search returns stale cache after update',
+    'At least one test case exists. The search index has been populated.',
+    JSON.stringify(['Create a new test case titled "Unique Cache Target".', 'Immediately search for "Unique Cache Target".', 'Observe search results.']),
+    'The newly created test case appears in search results on the first query after creation.',
+    'Major', 'Ready'
+  );
+  const tc8 = insertTC.run(
+    'Session token expires during long test run',
+    'A test run has been started. The session token TTL is set to 30 minutes.',
+    JSON.stringify(['Start a test run with 20 test cases.', 'Wait 35 minutes without interacting with the UI.', 'Attempt to submit a result for the next test case.']),
+    'The session is renewed automatically or a clear re-authentication prompt appears. The in-progress run is not lost.',
+    'Major', 'Draft'
+  );
+  const tc9 = insertTC.run(
+    'Export generates malformed CSV for special characters',
+    'At least one test case with a title containing commas and quotes exists.',
+    JSON.stringify(['Navigate to the Reports page.', 'Click "Export CSV" on any report.', 'Open the downloaded file in a spreadsheet application.']),
+    'The CSV opens correctly. Each row maps to one report result. Fields containing commas or quotes are properly quoted and escaped.',
+    'Minor', 'Draft'
+  );
+  const tc10 = insertTC.run(
+    'Dashboard metrics refresh on navigation',
+    'At least one completed test run exists with non-zero pass and fail counts.',
+    JSON.stringify(['Navigate away from the Dashboard to any other page.', 'Navigate back to the Dashboard.', 'Observe the pass rate and run count metrics.']),
+    'The Dashboard metrics reflect the current database state. Counts match the most recent completed run without requiring a manual page refresh.',
+    'Minor', 'Ready'
+  );
+
+  const tc6id  = tc6.lastInsertRowid;
+  const tc7id  = tc7.lastInsertRowid;
+  const tc8id  = tc8.lastInsertRowid;
+  const tc9id  = tc9.lastInsertRowid;
+  const tc10id = tc10.lastInsertRowid;
+
+  console.log('Seeded 5 flaky test cases.');
+
+  // Flaky Validation Suite containing all 10 test cases
+  const existingIds = db.prepare('SELECT id FROM test_cases ORDER BY id ASC').all().map(r => r.id);
+  const insertSuite = db.prepare('INSERT INTO suites (name, feature, status) VALUES (?, ?, ?)');
+  const insertLink  = db.prepare('INSERT OR IGNORE INTO suite_test_cases (suite_id, test_case_id, sort_order) VALUES (?, ?, ?)');
+
+  const flakysuite = insertSuite.run('Flaky Validation Suite', 'Stability & Flakiness', 'In Progress');
+  const fsid = flakysuite.lastInsertRowid;
+  existingIds.forEach((tcid, i) => insertLink.run(fsid, tcid, i));
+
+  console.log('Seeded Flaky Validation Suite.');
+
+  // Result patterns: P=passed, F=failed
+  const PATTERNS = {
+    [existingIds[0]]: ['passed','passed','passed','passed','passed','failed','passed','passed','passed','passed','passed','passed'], // TC1 92% stable
+    [existingIds[1]]: ['failed','passed','failed','failed','passed','failed','passed','failed','passed','failed','failed','passed'], // TC2 42% flaky
+    [existingIds[2]]: ['failed','failed','passed','failed','failed','failed','passed','failed','failed','passed','failed','failed'], // TC3 25% flaky
+    [existingIds[3]]: ['passed','failed','passed','passed','failed','passed','failed','passed','passed','failed','passed','failed'], // TC4 58% flaky
+    [existingIds[4]]: ['passed','passed','passed','passed','failed','passed','passed','passed','failed','passed','passed','passed'], // TC5 83% unstable
+    [tc6id]:  ['passed','failed','passed','failed','passed','failed','passed','failed','passed','failed','passed','failed'], // 50% flaky
+    [tc7id]:  ['failed','failed','failed','passed','failed','failed','passed','failed','failed','failed','passed','failed'], // 25% flaky
+    [tc8id]:  ['passed','passed','passed','passed','failed','passed','passed','passed','passed','passed','passed','failed'], // 83% unstable
+    [tc9id]:  ['failed','failed','failed','failed','failed','failed','failed','failed','failed','failed','failed','passed'], // 8% unstable
+    [tc10id]: ['failed','failed','passed','failed','passed','passed','passed','passed','passed','passed','passed','passed'], // 75% flaky
+  };
+
+  const FAILURE_NOTES = {
+    [existingIds[1]]: 'Login form validation did not trigger on submit.',
+    [existingIds[2]]: 'Filter returned empty result set despite matching records existing.',
+    [existingIds[3]]: 'Search index returned stale results.',
+    [tc6id]:  'Connection pool exhausted under concurrent load.',
+    [tc7id]:  'Cache not invalidated after record creation.',
+    [tc9id]:  'Special characters in title caused malformed CSV row.',
+  };
+
+  const insertRun    = db.prepare(`INSERT INTO test_runs_v2 (suite_id, status, pass_count, fail_count, skip_count, start_time, end_time, created_by) VALUES (?, 'completed', ?, ?, 0, datetime('now', ?), datetime('now', ?), 'flaky-seed')`);
+  const insertResult = db.prepare(`INSERT INTO test_run_results (run_id, test_case_id, result, notes, duration_ms, failed_at, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, datetime('now', ?), datetime('now', ?))`);
+
+  db.transaction(() => {
+    for (let runIdx = 0; runIdx < 12; runIdx++) {
+      const offsetHours = -(12 - runIdx) * 48;
+      const startOffset = `-${Math.abs(offsetHours)} hours`;
+      const endOffset   = `-${Math.abs(offsetHours) - 1} hours`;
+
+      let pass = 0, fail = 0;
+      for (const tcid of existingIds) {
+        const res = PATTERNS[tcid]?.[runIdx] ?? 'passed';
+        if (res === 'passed') pass++; else fail++;
+      }
+
+      const run = insertRun.run(fsid, pass, fail, startOffset, endOffset);
+      const runId = run.lastInsertRowid;
+      const createdOffset = `-${Math.abs(offsetHours)} hours`;
+
+      for (const tcid of existingIds) {
+        const res   = PATTERNS[tcid]?.[runIdx] ?? 'passed';
+        const notes = res === 'failed' ? (FAILURE_NOTES[tcid] ?? '') : '';
+        const failedAt = res === 'failed'
+          ? new Date(Date.now() + offsetHours * 3600000).toISOString().replace('T', ' ').slice(0, 19)
+          : null;
+        insertResult.run(runId, tcid, res, notes, 400 + runIdx * 100, failedAt, createdOffset, createdOffset);
+      }
+    }
+  })();
+
+  console.log('Seeded 12 flaky test runs (120 results).');
+
+  refreshStats();
+  console.log('Computed initial flakiness stats.');
+}

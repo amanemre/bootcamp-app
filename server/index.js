@@ -8,6 +8,7 @@ const dashboardRouter = require('./routes/dashboard');
 const reportsRouter   = require('./routes/reports');
 const settingsRouter  = require('./routes/settings');
 const searchRouter    = require('./routes/search');
+const { router: flakyRouter } = require('./routes/flaky-tests');
 const seed = require('./seed');
 
 const app = express();
@@ -31,7 +32,8 @@ app.use('/api/runs',       runsRouter);
 app.use('/api/dashboard',  dashboardRouter);
 app.use('/api/reports',    reportsRouter);
 app.use('/api/settings',   settingsRouter);
-app.use('/api/search',     searchRouter);
+app.use('/api/search',      searchRouter);
+app.use('/api/flaky-tests', flakyRouter);
 
 // Serve the built React app
 const clientDist = path.join(__dirname, '../client/dist');

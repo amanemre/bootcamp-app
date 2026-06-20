@@ -12,7 +12,8 @@ import TestRuns from './pages/TestRuns';
 import TestRunDetail from './pages/TestRunDetail';
 import Reports from './pages/Reports';
 import ReportDetail from './pages/ReportDetail';
-import Settings from './pages/Settings';
+import Settings   from './pages/Settings';
+import FlakyTests from './pages/FlakyTests';
 
 // Rendered inside ShortcutsProvider so Nav can open the command palette.
 function AppShell() {
@@ -32,6 +33,7 @@ function AppShell() {
         <Route path="/reports"         element={<Reports />} />
         <Route path="/reports/:id"     element={<ReportDetail />} />
         <Route path="/settings"        element={<Settings />} />
+        <Route path="/flaky-tests"     element={<FlakyTests />} />
       </Routes>
     </>
   );
