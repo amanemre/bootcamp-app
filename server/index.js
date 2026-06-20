@@ -1,4 +1,3 @@
-// smoke test: verifying the PR auto-review workflow (safe to revert)
 const path    = require('path');
 const express = require('express');
 const testCasesRouter = require('./routes/test-cases');
