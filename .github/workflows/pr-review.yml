@@ -13,16 +13,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: anthropics/claude-code-action@v1
+        with:
+          fetch-depth: 1
+      - id: claude
+        uses: anthropics/claude-code-action@v1
         env:
           GH_TOKEN: ${{ github.token }}
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           github_token: ${{ github.token }}
+          claude_args: |
+            --allowedTools "Bash(gh pr comment:*)"
           prompt: |
             Post a comment on PR #${{ github.event.pull_request.number }} by running:
             gh pr comment ${{ github.event.pull_request.number }} --body "Diagnostic: workflow pipeline is wired up correctly."
       - if: always()
         run: |
           echo "=== claude execution output ==="
-          cat /home/runner/work/_temp/claude-execution-output.json || echo "(file not found)"
+          cat "${{ steps.claude.outputs.execution_file }}" || echo "(file not found)"
