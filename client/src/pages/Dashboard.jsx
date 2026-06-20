@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PassRateTrendChart, BugsWeeklyChart, CoverageDonutChart, ChartSkeleton } from '../components/DashboardCharts';
-import { formatDate } from '../utils/datetime';
+import { formatDate, formatDateTime } from '../utils/datetime';
 
 const REFRESH_MS = 30000;
 
@@ -123,7 +123,7 @@ export default function Dashboard() {
       if (mJson.success) {
         setData(mJson.data);
         setError('');
-        setUpdatedAt(new Date());
+        setUpdatedAt(new Date().toISOString().replace('T', ' ').slice(0, 19));
       } else {
         setError(mJson.error || 'Failed to load dashboard data.');
       }
@@ -178,7 +178,7 @@ export default function Dashboard() {
         <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700 }}>Dashboard</h1>
         {updatedAt && (
           <span style={{ fontSize: 12, color: 'var(--text-faint)' }}>
-            Updated {updatedAt.toLocaleTimeString('en-GB')} · auto-refreshes every 30s
+            Updated {formatDateTime(updatedAt)} · auto-refreshes every 30s
           </span>
         )}
       </div>

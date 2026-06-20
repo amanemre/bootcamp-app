@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { formatDateTime } from '../utils/datetime';
 
 const FLAKY_STYLES = {
   Flaky:    { background: '#fee2e2', color: '#dc2626' },
@@ -240,7 +241,7 @@ export default function FlakyTests() {
       </div>
       {updatedAt && (
         <p style={{ margin: '0 0 20px', fontSize: 13, color: 'var(--text-faint)' }}>
-          Last updated: {updatedAt.replace('T', ' ').slice(0, 19)} UTC
+          Last updated: {formatDateTime(updatedAt)}
         </p>
       )}
 
