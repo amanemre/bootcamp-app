@@ -1,0 +1,116 @@
+{
+  "name": "qa-command-center",
+  "displayName": "QA Command Center",
+  "version": "1.0.0",
+  "description": "A portable Claude Code plugin providing structured QA workflows: test case generation, bug reporting, code review, flaky test detection, and automated quality hooks.",
+  "author": "Emre Aman",
+  "license": "MIT",
+  "commands": [
+    {
+      "name": "bug-report",
+      "description": "Interactive ISTQB-compliant bug report creation — asks six questions one at a time and writes a formatted report to tests/bugs/",
+      "file": ".claude/commands/bug-report.md"
+    },
+    {
+      "name": "new-test",
+      "description": "Interactive manual test case creation — collects feature, steps, and expected outcome, then writes to tests/manual/",
+      "file": ".claude/commands/new-test.md"
+    },
+    {
+      "name": "new-method",
+      "description": "Interactive utility method generator — collects name, language, signature, error handling, and edge cases, then generates code and optional unit tests",
+      "file": ".claude/commands/new-method.md"
+    }
+  ],
+  "skills": [
+    {
+      "name": "test-generator",
+      "description": "ISTQB boundary-value analysis and equivalence partitioning technique for generating comprehensive test suites",
+      "file": ".claude/skills/test-generator/SKILL.md"
+    },
+    {
+      "name": "qa-review",
+      "description": "Structured QA review across six categories: missing validation, error handling, user messages, confirmation dialogs, accessibility, and edge cases",
+      "file": ".claude/skills/qa-review/SKILL.md"
+    },
+    {
+      "name": "bug-report-generator",
+      "description": "Converts raw tester notes, logs, or unstructured descriptions into professional submission-ready bug reports",
+      "file": ".claude/skills/bug-report-generator/SKILL.md"
+    }
+  ],
+  "agents": [
+    {
+      "name": "test-writer",
+      "description": "Generates comprehensive, coverage-complete test suites from any feature description, user story, or API contract",
+      "file": ".claude/agents/test-writer.md"
+    },
+    {
+      "name": "bug-reporter",
+      "description": "Guides structured defect documentation via a conversational interview; delegates formatting to the bug-report command",
+      "file": ".claude/agents/bug-reporter.md"
+    },
+    {
+      "name": "qa-reviewer",
+      "description": "Reviews code changes, features, PRs, and architecture plans from a QA perspective; outputs findings grouped by severity",
+      "file": ".claude/agents/qa-reviewer.md"
+    },
+    {
+      "name": "flake-analyzer",
+      "description": "Diagnoses flaky tests by analyzing pass/fail history patterns and failure notes; returns a single root-cause hypothesis",
+      "file": ".claude/agents/flake-analyzer.md"
+    }
+  ],
+  "hooks": [
+    {
+      "name": "check-response-shape",
+      "event": "PostToolUse",
+      "matcher": "Edit|Write",
+      "description": "Warns when a server/routes/*.js file may return a response missing the required {success, data, error} envelope",
+      "file": ".claude/hooks/check-response-shape.sh"
+    },
+    {
+      "name": "check-severity-enum",
+      "event": "PostToolUse",
+      "matcher": "Edit|Write",
+      "description": "Warns when non-standard severity strings ('high', 'medium', 'low', 'blocker', 'cosmetic') appear as literals in JS/JSX files",
+      "file": ".claude/hooks/check-severity-enum.sh"
+    },
+    {
+      "name": "check-js-build",
+      "event": "PostToolUse",
+      "matcher": "Edit|Write",
+      "description": "Runs tsc --noEmit and npm run lint after JS/TS source writes; runs npm run build additionally after config file changes",
+      "file": ".claude/hooks/check-js-build.sh"
+    },
+    {
+      "name": "flaky-test-detector",
+      "event": "PostToolUse",
+      "matcher": "Bash",
+      "description": "Fires after test run result writes; calls /api/flaky-tests/refresh and sends a Discord alert for each newly detected flaky test",
+      "file": ".claude/hooks/flaky-test-detector.sh"
+    }
+  ],
+  "settings": {
+    "hooksFragment": ".claude/settings.json",
+    "description": "Merge the hooks array from this file into your project's .claude/settings.json to activate all four hooks"
+  },
+  "mcp": {
+    "discord": {
+      "package": "@pasympa/discord-mcp",
+      "configTemplate": ".mcp.json",
+      "description": "Discord bot integration for interactive MCP use and automated flake alerts",
+      "envRequired": ["DISCORD_BOT_TOKEN"]
+    }
+  },
+  "env": {
+    "DISCORD_BOT_TOKEN": {
+      "description": "Discord bot token — required for Discord MCP and flaky-test-detector hook alerts",
+      "required": false
+    },
+    "DISCORD_FLAKY_CHANNEL_ID": {
+      "description": "Discord channel ID that receives new-flake alert messages from the flaky-test-detector hook",
+      "required": false
+    }
+  }
+}
